@@ -1,0 +1,32 @@
+disabled_rules:
+- identifier_name
+- trailing_whitespace
+- cyclomatic_complexity
+- nesting
+
+excluded:
+- Pods/
+
+# 1行の文字列制限
+line_length:
+- 200   # warning
+- 300   # error
+
+# 1ファイルの行数制限
+file_length:
+- 500   # warning
+- 1000  # error
+
+# 1つのclassの行数制限
+type_body_length:
+- 500   # warning
+- 1000  # error
+
+# メソッドの行数制限
+function_body_length:
+- 100   # warning
+- 200   # error
+
+type_name:
+  min_length: 1
+  max_length: 40
