@@ -26,13 +26,13 @@ struct AmedasTableLoader {
         case parseError
     }
     
-    func load(completion: @escaping (Result<[AmedasPoint], LoadError>) -> Void) {
-        let urlString = "https://www.jma.go.jp/bosai/amedas/const/amedastable.json"
-        guard let url = URL(string: urlString) else {
+    func load(completion: @escaping (Result<[String: AmedasPoint], LoadError>) -> Void) {
+        guard let url = URL(string: API.amedasPointTable) else {
             completion(.failure(.wrongUrl))
             return
         }
 
+        LOG("load: " + url.absoluteString)
         let task = URLSession.shared.dataTask(with: url) { (data, _, error) in
             guard let data = data, error == nil else {
                 LOG("http error.")
@@ -46,20 +46,17 @@ struct AmedasTableLoader {
                 return
             }
             
-//            for point in list {
-//                LOG(point.description)
-//            }
             completion(.success(list))
         }
         task.resume()
     }
     
-    func parseAmedasTable(data: Data) -> [AmedasPoint]? {
+    func parseAmedasTable(data: Data) -> [String: AmedasPoint]? {
         guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: [String: Any]] else {
             return nil
         }
 
-        var list: [AmedasPoint] = []
+        var list: [String: AmedasPoint] = [:]
         for item in json {
             let pointID = item.key
             guard let pointNameJa = item.value["kjName"] as? String,
@@ -74,9 +71,8 @@ struct AmedasTableLoader {
                                     pointNameEn: pointNameEn,
                                     latitude: lats[0] + lats[1] / 60,
                                     longitude: lons[0] + lons[1] / 60)
-            list.append(point)
+            list[pointID] = point
         }
-        list.sort { $0.pointID < $1.pointID }
         return list
     }
 }

@@ -20,14 +20,14 @@ class AmedasPointTests: XCTestCase {
         let list = AmedasTableLoader().parseAmedasTable(data: testData)!
         XCTAssertEqual(list.count, 2)
 
-        XCTAssertEqual(list[0].pointID, "11001")
-        XCTAssertEqual(list[0].pointNameJa, "宗谷岬")
-        XCTAssertEqual(list[0].latitude, 45 + 31.2 / 60)
-        XCTAssertEqual(list[0].longitude, 141 + 56.1 / 60)
+        XCTAssertEqual(list["11001"]!.pointID, "11001")
+        XCTAssertEqual(list["11001"]!.pointNameJa, "宗谷岬")
+        XCTAssertEqual(list["11001"]!.latitude, 45 + 31.2 / 60)
+        XCTAssertEqual(list["11001"]!.longitude, 141 + 56.1 / 60)
         
-        XCTAssertEqual(list[1].pointID, "11016")
-        XCTAssertEqual(list[1].pointNameJa, "稚内")
-        XCTAssertEqual(list[1].latitude, 45 + 24.9 / 60)
-        XCTAssertEqual(list[1].longitude, 141 + 40.7 / 60)
+        XCTAssertEqual(list["11016"]!.pointID, "11016")
+        XCTAssertEqual(list["11016"]!.pointNameJa, "稚内")
+        XCTAssertEqual(list["11016"]!.latitude, 45 + 24.9 / 60)
+        XCTAssertEqual(list["11016"]!.longitude, 141 + 40.7 / 60)
     }
 }
