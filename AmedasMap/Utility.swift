@@ -16,3 +16,5 @@ public func LOG(_ body: String, filename: String = #file, functionName: String =
         NSLog("[%@:%d] %@", file, line, body)
     #endif
 }
+
+let TimeZoneJST = TimeZone(identifier: "JST")

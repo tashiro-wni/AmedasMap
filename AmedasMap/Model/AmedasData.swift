@@ -7,6 +7,21 @@
 
 import Foundation
 
+enum AmedasElement {
+    case temperature, precipitation, wind
+    
+    func next() -> Self {
+        switch self {
+        case .temperature:
+            return .precipitation
+        case .precipitation:
+            return .wind
+        case .wind:
+            return .temperature
+        }
+    }
+}
+
 struct AmedasData: CustomStringConvertible {
     let pointID: String
     let temperature: Double?
@@ -15,40 +30,53 @@ struct AmedasData: CustomStringConvertible {
     let windDirection: Int?
     let windSpeed: Double?
     
+    var temperatureText: String {
+        guard let temperature = temperature else { return "-" }
+        return String(format: "%.1f℃", temperature)
+    }
+
+    var precipitationText: String {
+        guard let precipitation = precipitation1h else { return "-" }
+        return String(format: "%.1fmm/h", precipitation)
+    }
+    
+    var windText: String {
+        guard let windDir = windDirection, let windSpeed = windSpeed else { return "-" }
+        return String(format: "wind:%d %.1fm/s", windDir, windSpeed)
+    }
+    
     var description: String {
         var ary: [String] = []
         ary.append(pointID)
-        if let temperature = temperature {
-            ary.append(String(format: "temp:%.1f℃", temperature))
-        }
-        if let precipitation1h = precipitation1h {
-            ary.append(String(format: "prec:%.1fmm/h", precipitation1h))
-        }
-        if let windDir = windDirection, let windSpeed = windSpeed {
-            ary.append(String(format: "wind:%d %.1fm/s", windDir, windSpeed))
-        }
+        ary.append("temp:" + temperatureText)
+        ary.append("prec:" + precipitationText)
+        ary.append("wind:" + windText)
         return ary.joined(separator: ", ")
     }
 }
 
 struct AmedasDataLoader {
+    struct AmedasReult {
+        let date: Date
+        let data: [AmedasData]
+    }
+    
     enum LoadError: Error {
         case wrongUrl
         case httpError
         case parseError
     }
     
-    static let timeZone = TimeZone(identifier: "JST")
     private let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyyMMddHHmm"
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-        dateFormatter.timeZone = Self.timeZone
+        dateFormatter.timeZone = TimeZoneJST
         return dateFormatter
     }()
     
     // 最新データの時刻を取得
-    func load(completion: @escaping (Result<[AmedasData], LoadError>) -> Void) {
+    func load(completion: @escaping (Result<AmedasReult, LoadError>) -> Void) {
         guard let url = URL(string: API.amedasLatestTime) else {
             completion(.failure(.wrongUrl))
             return
@@ -63,7 +91,7 @@ struct AmedasDataLoader {
             }
             
             let formatter = ISO8601DateFormatter()
-            formatter.timeZone = Self.timeZone
+            formatter.timeZone = TimeZoneJST
             
             guard let text = String(data: data, encoding: .utf8),
                   let date = formatter.date(from: text) else {
@@ -79,7 +107,7 @@ struct AmedasDataLoader {
     }
   
     // 指定時刻の観測値一覧を取得
-    private func load(date: Date, completion: @escaping (Result<[AmedasData], LoadError>) -> Void) {
+    private func load(date: Date, completion: @escaping (Result<AmedasReult, LoadError>) -> Void) {
         let urlString = String(format: API.amedasMapData, dateFormatter.string(from: date))
         guard let url = URL(string: urlString) else {
             completion(.failure(.wrongUrl))
@@ -100,7 +128,7 @@ struct AmedasDataLoader {
                 return
             }
             
-            completion(.success(list))
+            completion(.success(AmedasReult(date: date, data: list)))
         }
         task.resume()
     }

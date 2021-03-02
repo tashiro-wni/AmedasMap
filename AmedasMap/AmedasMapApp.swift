@@ -11,8 +11,7 @@ import SwiftUI
 struct AmedasMapApp: App {
     var body: some Scene {
         WindowGroup {
-            MapView(viewModel: AmedasMapViewModel())
-                .edgesIgnoringSafeArea(.all)
+            ContentView()
         }
     }
 }

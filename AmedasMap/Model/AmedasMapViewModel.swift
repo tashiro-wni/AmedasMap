@@ -33,16 +33,22 @@ extension AmedasData {
 
 final class AmedasAnnotation: MKPointAnnotation {
     let amedasData: AmedasData
+    let element: AmedasElement
     
-    init(point: AmedasPoint, data: AmedasData) {
+    init(point: AmedasPoint, data: AmedasData, element: AmedasElement) {
         amedasData = data
+        self.element = element
         super.init()
         coordinate = point.coordinate
         title = point.pointNameJa
-        if let temperature = data.temperature {
-            subtitle = String(format: "%.1f℃", temperature)
-        } else {
-            subtitle = "-"
+        
+        switch element {
+        case .temperature:
+            subtitle = data.temperatureText
+        case .precipitation:
+            subtitle = data.precipitationText
+        case .wind:
+            subtitle = data.windText
         }
     }
 }
@@ -50,11 +56,24 @@ final class AmedasAnnotation: MKPointAnnotation {
 final class AmedasMapViewModel: NSObject, ObservableObject {
     @Published private(set) var amedasPoints: [String: AmedasPoint] = [:]
     @Published private(set) var amedasData: [AmedasData] = []
+    @Published private(set) var date: Date?
+    @Published private(set) var dateText = "Loading..."
+    @Published var displayElement: AmedasElement = .temperature
+
     private var annotations: [MKAnnotation] = []
+    
+    private let dateFormatter: DateFormatter = {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "M/d HH:mm"
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.timeZone = TimeZoneJST
+        return dateFormatter
+    }()
     
     override init() {
         super.init()
         loadPoints()
+        loadData()
     }
     
     func loadPoints() {
@@ -69,13 +88,20 @@ final class AmedasMapViewModel: NSObject, ObservableObject {
                 break
             }
         }
-        
+    }
+     
+    func loadData() {
+        LOG(#function)
         AmedasDataLoader().load() { [weak self] result in
             switch result {
             case .success(let data):
                 DispatchQueue.main.async { [weak self] in
-                    LOG("update amedasData \(data.count) points.")
-                    self?.amedasData = data
+                    guard let self = self else { return }
+                    LOG("update amedasData \(data.data.count) points.")
+                    self.amedasData = data.data
+                    self.date = data.date
+                    self.dateText = self.dateFormatter.string(from: data.date)
+                    LOG("date: \(self.dateText)")
                 }
             case .failure:
                 break
@@ -89,10 +115,12 @@ final class AmedasMapViewModel: NSObject, ObservableObject {
         
         for data in amedasData {
             if let point = amedasPoints[data.pointID], data.temperature != nil {
-                annotations.append(AmedasAnnotation(point: point, data: data))
+                annotations.append(AmedasAnnotation(point: point, data: data, element: displayElement))
             }
         }
+        LOG(#function + ", plot \(annotations.count) points.")
         mapView.addAnnotations(annotations)
+        mapView.setNeedsDisplay()
     }
 }
 
