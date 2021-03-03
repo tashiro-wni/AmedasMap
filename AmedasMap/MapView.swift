@@ -20,7 +20,7 @@ struct MapView: UIViewRepresentable {
         mapView.delegate = viewModel
         mapView.mapType = .mutedStandard
         mapView.isPitchEnabled = false
-        mapView.register(MKPinAnnotationView.self, forAnnotationViewWithReuseIdentifier: "point")
+        mapView.register(CircleAnnotationView.self, forAnnotationViewWithReuseIdentifier: "point")
         mapView.region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 35.681, longitude: 139.767),
                                             span: MKCoordinateSpan(latitudeDelta: 5.0, longitudeDelta: 5.0))
         return mapView

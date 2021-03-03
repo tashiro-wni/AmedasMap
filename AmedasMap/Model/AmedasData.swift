@@ -30,6 +30,18 @@ struct AmedasData: CustomStringConvertible {
     let windDirection: Int?
     let windSpeed: Double?
     
+    func hasValidData(for element: AmedasElement) -> Bool {
+        switch element {
+        case .temperature:
+            return temperature != nil
+        case .precipitation:
+            return precipitation1h != nil
+        case .wind:
+            guard let windDirection = windDirection, windDirection >= 0, windDirection < directionText.count else { return false }
+            return windSpeed != nil
+        }
+    }
+
     var temperatureText: String {
         guard let temperature = temperature else { return "-" }
         return String(format: "%.1f℃", temperature)
@@ -40,9 +52,14 @@ struct AmedasData: CustomStringConvertible {
         return String(format: "%.1fmm/h", precipitation)
     }
     
+    let directionText = [ "", "北北東", "北東", "東北東", "東",
+                          "東南東", "南東", "南南東", "南",
+                          "南南西", "南西", "西南西", "西",
+                          "西北西", "北西", "北北西", "北" ]
     var windText: String {
-        guard let windDir = windDirection, let windSpeed = windSpeed else { return "-" }
-        return String(format: "wind:%d %.1fm/s", windDir, windSpeed)
+        guard let windDir = windDirection, windDir >= 0, windDir < directionText.count,
+              let windSpeed = windSpeed else { return "-" }
+        return String(format: "%@ %.1fm/s", directionText[windDir], windSpeed)
     }
     
     var description: String {

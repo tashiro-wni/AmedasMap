@@ -22,8 +22,11 @@ struct ContentView: View {
                 //viewModel.loadData()
             }, label: {
                 Image(systemName: "gobackward")
+                    .resizable()
+                    .padding(8)
                     .frame(width: 40, height: 40)
                     .background(Color.white)
+                    .cornerRadius(4)
             })
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
             .padding(24)
