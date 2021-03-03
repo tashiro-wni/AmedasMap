@@ -93,6 +93,8 @@ final class AmedasMapViewModel: NSObject, ObservableObject {
     @Published private(set) var amedasData: [AmedasData] = []
     @Published private(set) var date: Date?
     @Published private(set) var dateText = "Loading..."
+    @Published private(set) var errorMessage: String?
+    @Published var hasError = false
     @Published var displayElement: AmedasElement = .temperature
 
     private var annotations: [MKAnnotation] = []
@@ -112,34 +114,43 @@ final class AmedasMapViewModel: NSObject, ObservableObject {
     }
     
     func loadPoints() {
+        errorMessage = nil
+        hasError = false
+
         AmedasTableLoader().load() { [weak self] result in
-            switch result {
-            case .success(let points):
-                DispatchQueue.main.async { [weak self] in
+            DispatchQueue.main.async { [weak self] in
+                switch result {
+                case .success(let points):
                     LOG("update amedasPoints \(points.count) points.")
                     self?.amedasPoints = points
+                    
+                case .failure:
+                    self?.errorMessage = "データが読み込めませんでした。"
+                    self?.hasError = true
                 }
-            case .failure:
-                break
             }
         }
     }
      
     func loadData() {
         LOG(#function)
+        errorMessage = nil
+        hasError = false
+
         AmedasDataLoader().load() { [weak self] result in
-            switch result {
-            case .success(let data):
-                DispatchQueue.main.async { [weak self] in
-                    guard let self = self else { return }
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                switch result {
+                case .success(let data):
                     LOG("update amedasData \(data.data.count) points.")
                     self.amedasData = data.data
                     self.date = data.date
                     self.dateText = self.dateFormatter.string(from: data.date)
                     LOG("date: \(self.dateText)")
+                case .failure:
+                    self.errorMessage = "データが読み込めませんでした。"
+                    self.hasError = true
                 }
-            case .failure:
-                break
             }
         }
     }
@@ -153,7 +164,7 @@ final class AmedasMapViewModel: NSObject, ObservableObject {
                 annotations.append(AmedasAnnotation(point: point, data: data, element: displayElement))
             }
         }
-        LOG(#function + ", \(displayElement), plot \(annotations.count) points.")
+        LOG(#function + ", \(dateText), \(displayElement), plot \(annotations.count) points.")
         mapView.addAnnotations(annotations)
         mapView.setNeedsDisplay()
     }

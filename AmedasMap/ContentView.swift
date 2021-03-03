@@ -14,24 +14,38 @@ struct ContentView: View {
         ZStack {
             MapView(viewModel: viewModel)
                 .edgesIgnoringSafeArea(.all)
-            Text(viewModel.dateText)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
-                .padding(24)
-            Button(action: {
-                viewModel.displayElement = viewModel.displayElement.next()
-                //viewModel.loadData()
-            }, label: {
-                Image(systemName: "gobackward")
-                    .resizable()
-                    .padding(8)
-                    .frame(width: 40, height: 40)
-                    .background(Color.white)
-                    .cornerRadius(4)
-            })
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+                        
+            HStack {
+                // データの時刻
+                Text(viewModel.dateText)
+
+                // 表示要素を選択
+                Picker(selection: $viewModel.displayElement, label: Spacer()) {
+                    Image(systemName: "thermometer").tag(AmedasElement.temperature)
+                    Image(systemName: "drop").tag(AmedasElement.precipitation)
+                    Image(systemName: "wind").tag(AmedasElement.wind)
+                }
+                .pickerStyle(SegmentedPickerStyle())
+                .frame(width: 200)
+                
+                // 再読み込み
+                Button(action: {
+                    viewModel.loadData()
+                }, label: {
+                    Image(systemName: "gobackward")
+                        .resizable()
+                        .padding(8)
+                        .frame(width: 30, height: 30)
+                        .background(Color.white)
+                        .cornerRadius(4)
+                })
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
             .padding(24)
-
-
+        }
+        .alert(isPresented: $viewModel.hasError) {
+            // エラー時にはAlertを表示する
+            Alert(title: Text(viewModel.errorMessage ?? ""))
         }
     }
 }
