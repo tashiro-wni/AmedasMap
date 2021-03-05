@@ -20,6 +20,7 @@
 		1273A54825EBCD5300872407 /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1273A54725EBCD5300872407 /* Utility.swift */; };
 		1273A55325EBD08B00872407 /* AmedasPointTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1273A55225EBD08B00872407 /* AmedasPointTests.swift */; };
 		1273A55E25EBF3E100872407 /* AmedasMapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1273A55D25EBF3E100872407 /* AmedasMapViewModel.swift */; };
+		12FFD23225F26691002913B8 /* AmedasAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12FFD23125F26691002913B8 /* AmedasAnnotationView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,6 +60,7 @@
 		1273A54725EBCD5300872407 /* Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
 		1273A55225EBD08B00872407 /* AmedasPointTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmedasPointTests.swift; sourceTree = "<group>"; };
 		1273A55D25EBF3E100872407 /* AmedasMapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmedasMapViewModel.swift; sourceTree = "<group>"; };
+		12FFD23125F26691002913B8 /* AmedasAnnotationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmedasAnnotationView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,6 +114,7 @@
 				1273A4F625EB98AA00872407 /* AmedasMapApp.swift */,
 				122CC63625EE782A0070093A /* ContentView.swift */,
 				1273A52D25EB994300872407 /* MapView.swift */,
+				12FFD23125F26691002913B8 /* AmedasAnnotationView.swift */,
 				1273A54125EBCAA600872407 /* Model */,
 				1273A54725EBCD5300872407 /* Utility.swift */,
 				1273A4FA25EB98AC00872407 /* Assets.xcassets */,
@@ -288,6 +291,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				12FFD23225F26691002913B8 /* AmedasAnnotationView.swift in Sources */,
 				122CC62A25ED14680070093A /* AmedasData.swift in Sources */,
 				1273A54825EBCD5300872407 /* Utility.swift in Sources */,
 				122CC63725EE782B0070093A /* ContentView.swift in Sources */,

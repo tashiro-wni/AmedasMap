@@ -20,9 +20,13 @@ struct MapView: UIViewRepresentable {
         mapView.delegate = viewModel
         mapView.mapType = .mutedStandard
         mapView.isPitchEnabled = false
-        mapView.register(CircleAnnotationView.self, forAnnotationViewWithReuseIdentifier: "point")
+        mapView.isRotateEnabled = false
         mapView.region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 35.681, longitude: 139.767),
                                             span: MKCoordinateSpan(latitudeDelta: 5.0, longitudeDelta: 5.0))
+        for identifier in AmedasData.allIdentifiers {
+            mapView.register(AmedasAnnotationView.self, forAnnotationViewWithReuseIdentifier: identifier)
+        }
+        
         return mapView
     }
     

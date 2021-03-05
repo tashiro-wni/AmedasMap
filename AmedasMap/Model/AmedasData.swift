@@ -9,17 +9,6 @@ import Foundation
 
 enum AmedasElement {
     case temperature, precipitation, wind
-    
-    func next() -> Self {
-        switch self {
-        case .temperature:
-            return .precipitation
-        case .precipitation:
-            return .wind
-        case .wind:
-            return .temperature
-        }
-    }
 }
 
 struct AmedasData: CustomStringConvertible {
@@ -35,7 +24,8 @@ struct AmedasData: CustomStringConvertible {
         case .temperature:
             return temperature != nil
         case .precipitation:
-            return precipitation1h != nil
+            guard let precipitation1h = precipitation1h else { return false }
+            return precipitation1h > 0
         case .wind:
             guard let windDirection = windDirection, windDirection >= 0, windDirection < directionText.count else { return false }
             return windSpeed != nil
@@ -52,7 +42,7 @@ struct AmedasData: CustomStringConvertible {
         return String(format: "%.1fmm/h", precipitation)
     }
     
-    let directionText = [ "", "北北東", "北東", "東北東", "東",
+    let directionText = [ "静穏", "北北東", "北東", "東北東", "東",
                           "東南東", "南東", "南南東", "南",
                           "南南西", "南西", "西南西", "西",
                           "西北西", "北西", "北北西", "北" ]

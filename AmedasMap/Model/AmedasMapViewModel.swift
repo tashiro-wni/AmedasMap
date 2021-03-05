@@ -15,45 +15,67 @@ extension AmedasPoint {
 }
 
 extension AmedasData {
-    var temperatureColor: UIColor {
-        guard let temperature = temperature else { return .clear }
-        switch temperature {
-        case  35 ... 50:  return UIColor(hex: 0xe60000)
-        case  30 ..< 35:  return UIColor(hex: 0xf254b0)
-        case  25 ..< 30:  return UIColor(hex: 0xff8800)
-        case  20 ..< 25:  return UIColor(hex: 0xffd500)
-        case  15 ..< 20:  return UIColor(hex: 0x67cc33)
-        case  10 ..< 15:  return UIColor(hex: 0x56c6ff)
-        case   5 ..< 10:  return UIColor(hex: 0x3377ff)
-        case   0 ..< 5:   return UIColor(hex: 0x3377ff)
-        case -10 ..< 0:   return UIColor(hex: 0xb2b2b2)
-        case -50 ..< -10: return UIColor(hex: 0x9522e6)
-        default:  return .clear
+    private static let temperatureColors = [ "#E60000", "#F254B0", "#FF8800", "#FFD500", "#67CC33",
+                                             "#56C6FF", "#3377FF", "#3377FF", "#B2B2B2", "#9522E6" ]
+
+    private static let precipitationColors = [ "#D90000", "#FFBF00", "#002CB2", "#45A3E5", "#999999" ]
+    
+    private static let windColors = [ "#D90000", "#FF7F00", "#FFBF00", "#5FB235", "#002CB2", "#999999" ]
+    
+    static var allIdentifiers: [String] {
+        var list: [String] = []
+        for color in temperatureColors {
+            list.append("circle,\(color)")
         }
+        for color in precipitationColors {
+            list.append("circle,\(color)")
+        }
+        for dir in 0...16 {
+            for color in windColors {
+                list.append("arrow,\(dir),\(color)")
+            }
+        }
+        return list
     }
     
-    var precipitationColor: UIColor {
-        guard let precipitation1h = precipitation1h else { return .clear }
-        switch precipitation1h {
-        case 32 ... 500:  return UIColor(hex: 0xd90000)
-        case 16 ..<  32:  return UIColor(hex: 0xFFBF00)
-        case  4 ..<  16:  return UIColor(hex: 0x002CB2)
-        case  1 ..<   4:  return UIColor(hex: 0x45A3E5)
-        case  0 ..<   1:  return UIColor(hex: 0x999999)
-        default:  return .clear
-        }
-    }
-    
-    var windColor: UIColor {
-        guard let windSpeed = windSpeed else { return .clear }
-        switch windSpeed {
-        case 25 ... 99:  return UIColor(hex: 0xd90000)
-        case 20 ..< 25:  return UIColor(hex: 0xff7f00)
-        case 15 ..< 20:  return UIColor(hex: 0xffbf00)
-        case 10 ..< 15:  return UIColor(hex: 0x5fb235)
-        case  5 ..< 10:  return UIColor(hex: 0x002cb2)
-        case  0 ..<  5:  return UIColor(hex: 0x999999)
-        default:  return .clear
+    func reuseIdentifier(for element: AmedasElement) -> String? {
+        switch element {
+        case .temperature:
+            guard let temperature = temperature else { return nil }
+            switch temperature {
+            case  35 ... 50:  return "circle," + Self.temperatureColors[0]
+            case  30 ..< 35:  return "circle," + Self.temperatureColors[1]
+            case  25 ..< 30:  return "circle," + Self.temperatureColors[2]
+            case  20 ..< 25:  return "circle," + Self.temperatureColors[3]
+            case  15 ..< 20:  return "circle," + Self.temperatureColors[4]
+            case  10 ..< 15:  return "circle," + Self.temperatureColors[5]
+            case   5 ..< 10:  return "circle," + Self.temperatureColors[6]
+            case   0 ..< 5:   return "circle," + Self.temperatureColors[7]
+            case -10 ..< 0:   return "circle," + Self.temperatureColors[8]
+            case -50 ..< -10: return "circle," + Self.temperatureColors[9]
+            default:  return nil
+            }
+        case .precipitation:
+            guard let precipitation1h = precipitation1h else { return nil }
+            switch precipitation1h {
+            case 32 ... 500:  return "circle," + Self.precipitationColors[0]
+            case 16 ..<  32:  return "circle," + Self.precipitationColors[1]
+            case  4 ..<  16:  return "circle," + Self.precipitationColors[2]
+            case  1 ..<   4:  return "circle," + Self.precipitationColors[3]
+            case  0 ..<   1:  return "circle," + Self.precipitationColors[4]
+            default:  return nil
+            }
+        case .wind:
+            guard let windDirection = windDirection, let windSpeed = windSpeed else { return nil }
+            switch windSpeed {
+            case 25 ... 99:  return "arrow,\(windDirection),\(Self.windColors[0])"
+            case 20 ..< 25:  return "arrow,\(windDirection),\(Self.windColors[1])"
+            case 15 ..< 20:  return "arrow,\(windDirection),\(Self.windColors[2])"
+            case 10 ..< 15:  return "arrow,\(windDirection),\(Self.windColors[3])"
+            case  5 ..< 10:  return "arrow,\(windDirection),\(Self.windColors[4])"
+            case  0 ..<  5:  return "arrow,\(windDirection),\(Self.windColors[5])"
+            default:  return nil
+            }
         }
     }
 }
@@ -76,14 +98,6 @@ final class AmedasAnnotation: MKPointAnnotation {
             subtitle = data.precipitationText
         case .wind:
             subtitle = data.windText
-        }
-    }
-}
-
-final class CircleAnnotationView: MKAnnotationView {
-    var color: UIColor = .white {
-        didSet {
-            image = UIImage.circle(size: CGSize(width: 15, height: 15), color: color, borderColor: .white)
         }
     }
 }
@@ -172,29 +186,20 @@ final class AmedasMapViewModel: NSObject, ObservableObject {
 
 extension AmedasMapViewModel: MKMapViewDelegate {
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-        let view = mapView.dequeueReusableAnnotationView(withIdentifier: "point", for: annotation) as! CircleAnnotationView
-        view.annotation = annotation
-        view.canShowCallout = true
-        
-        if let amedas = annotation as? AmedasAnnotation {
-            switch displayElement {
-            case .temperature:
-                view.color = amedas.amedasData.temperatureColor
-            case .precipitation:
-                view.color = amedas.amedasData.precipitationColor
-            case .wind:
-                view.color = amedas.amedasData.windColor
-            }
-            
-            
-//            // https://stackoverflow.com/questions/58560959/sf-symbols-in-map-wont-apply-colors
-//            let image = UIImage(systemName: "circle.fill")!.withTintColor(color)
-//            let size = CGSize(width: 20, height: 20)
-//            view.image = UIGraphicsImageRenderer(size: size).image {
-//                _ in image.draw(in: CGRect(origin: .zero, size: size))
-//            }
+        var reuseIdentifier = ""
+        if let amedas = annotation as? AmedasAnnotation,
+           let identifier = amedas.amedasData.reuseIdentifier(for: displayElement) {
+            reuseIdentifier = identifier
         }
         
-        return view
+        if let view = mapView.dequeueReusableAnnotationView(withIdentifier: reuseIdentifier, for: annotation) as? AmedasAnnotationView {
+            view.annotation = annotation
+            view.canShowCallout = true
+            view.displayPriority = .defaultHigh
+            view.collisionMode = .circle
+            return view
+        }
+        
+        return nil
     }
 }
