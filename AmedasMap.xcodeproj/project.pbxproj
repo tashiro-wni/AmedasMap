@@ -20,6 +20,7 @@
 		1273A54825EBCD5300872407 /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1273A54725EBCD5300872407 /* Utility.swift */; };
 		1273A55325EBD08B00872407 /* AmedasPointTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1273A55225EBD08B00872407 /* AmedasPointTests.swift */; };
 		1273A55E25EBF3E100872407 /* AmedasMapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1273A55D25EBF3E100872407 /* AmedasMapViewModel.swift */; };
+		12EB685C25F3B0B40073F4FF /* AmedasDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12EB685B25F3B0B40073F4FF /* AmedasDataTests.swift */; };
 		12FFD23225F26691002913B8 /* AmedasAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12FFD23125F26691002913B8 /* AmedasAnnotationView.swift */; };
 /* End PBXBuildFile section */
 
@@ -60,6 +61,7 @@
 		1273A54725EBCD5300872407 /* Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
 		1273A55225EBD08B00872407 /* AmedasPointTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmedasPointTests.swift; sourceTree = "<group>"; };
 		1273A55D25EBF3E100872407 /* AmedasMapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmedasMapViewModel.swift; sourceTree = "<group>"; };
+		12EB685B25F3B0B40073F4FF /* AmedasDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmedasDataTests.swift; sourceTree = "<group>"; };
 		12FFD23125F26691002913B8 /* AmedasAnnotationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmedasAnnotationView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -137,6 +139,7 @@
 			children = (
 				1273A50825EB98AD00872407 /* AmedasMapTests.swift */,
 				1273A55225EBD08B00872407 /* AmedasPointTests.swift */,
+				12EB685B25F3B0B40073F4FF /* AmedasDataTests.swift */,
 				1273A50A25EB98AD00872407 /* Info.plist */,
 			);
 			path = AmedasMapTests;
@@ -307,6 +310,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				12EB685C25F3B0B40073F4FF /* AmedasDataTests.swift in Sources */,
 				1273A50925EB98AD00872407 /* AmedasMapTests.swift in Sources */,
 				1273A55325EBD08B00872407 /* AmedasPointTests.swift in Sources */,
 			);
