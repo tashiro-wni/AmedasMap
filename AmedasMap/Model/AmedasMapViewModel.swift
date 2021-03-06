@@ -73,10 +73,10 @@ final class AmedasMapViewModel: NSObject, ObservableObject {
                 guard let self = self else { return }
                 switch result {
                 case .success(let data):
-                    LOG("update amedasData \(self.dateText), \(data.data.count) points.")
                     self.amedasData = data.data
                     self.date = data.date
-                    //self.dateText = self.dateFormatter.string(from: data.date)
+                    LOG("update amedasData \(self.dateText), \(data.data.count) points.")
+
                 case .failure:
                     self.errorMessage = "データが読み込めませんでした。"
                 }
@@ -107,20 +107,9 @@ final class AmedasMapViewModel: NSObject, ObservableObject {
 
 extension AmedasMapViewModel: MKMapViewDelegate {
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-        var reuseIdentifier = ""
-        if let amedas = annotation as? AmedasAnnotation,
-           let identifier = amedas.amedasData.reuseIdentifier(for: displayElement) {
-            reuseIdentifier = identifier
-        }
+        guard let amedas = annotation as? AmedasAnnotation,
+              let reuseIdentifier = amedas.amedasData.reuseIdentifier(for: displayElement) else { return nil }
         
-        if let view = mapView.dequeueReusableAnnotationView(withIdentifier: reuseIdentifier, for: annotation) as? AmedasAnnotationView {
-            view.annotation = annotation
-            view.canShowCallout = true
-            view.displayPriority = .defaultHigh
-            view.collisionMode = .circle
-            return view
-        }
-        
-        return nil
+        return mapView.dequeueReusableAnnotationView(withIdentifier: reuseIdentifier, for: annotation)
     }
 }

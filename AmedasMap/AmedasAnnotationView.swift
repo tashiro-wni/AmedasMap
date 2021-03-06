@@ -26,13 +26,13 @@ private extension AmedasElement {
 // MARK: - AmedasData 地図上での表示を定義
 extension AmedasData {
     // アイコンの色
-    private static let elementColors: [AmedasElement: [ColorString]] =
-        [ .temperature:   [ "#9522E6", "#B2B2B2", "#3377FF", "#3377FF", "#56C6FF",
-                            "#67CC33", "#FFD500", "#FF8800", "#F254B0", "#E60000" ],
-          .precipitation: [ "#999999", "#45A3E5", "#002CB2", "#FFBF00", "#D90000" ],
-          .wind:          [ "#999999", "#002CB2", "#5FB235", "#FFBF00", "#FF7F00", "#D90000" ],
-          .sun:           [ "#999999", "#FFFF00", "#FFA500" ],
-          .humidity:      [ "#999999", "#45A3E5", "#002CB2" ] ]
+    private static let elementColors: [AmedasElement: [ColorString]] = [
+        .temperature:   [ "#9522E6", "#B2B2B2", "#3377FF", "#3377FF", "#56C6FF",
+                          "#67CC33", "#FFD500", "#FF8800", "#F254B0", "#E60000" ],
+        .precipitation: [ "#999999", "#45A3E5", "#002CB2", "#FFBF00", "#D90000" ],
+        .wind:          [ "#999999", "#002CB2", "#5FB235", "#FFBF00", "#FF7F00", "#D90000" ],
+        .sun:           [ "#999999", "#FFFF00", "#FFA500" ],
+        .humidity:      [ "#999999", "#45A3E5", "#002CB2" ] ]
 
     static var allIdentifiers: [String] {
         var list: [String] = []
@@ -156,7 +156,10 @@ final class AmedasAnnotationView: MKAnnotationView {
 
     override init(annotation: MKAnnotation?, reuseIdentifier: String?) {
         super.init(annotation: annotation, reuseIdentifier: reuseIdentifier)
-        
+        canShowCallout = true
+        displayPriority = .defaultHigh
+        collisionMode = .circle
+
         guard let reuseIdentifier = reuseIdentifier else { return }
         let ary = reuseIdentifier.components(separatedBy: ",")
         if ary.count == 2, ary[0] == AmedasElement.Shape.circle.rawValue, let color = UIColor(hex: ary[1]) {

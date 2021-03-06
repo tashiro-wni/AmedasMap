@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-extension AmedasElement {
+private extension AmedasElement {
     var image: Image {
         switch self {
         case .temperature:    return Image(systemName: "thermometer")
@@ -30,7 +30,7 @@ struct ContentView: View {
                         
             HStack {
                 // データの時刻
-                Text(viewModel.dateText)
+                //Text(viewModel.dateText)
 
                 // 表示要素を選択
                 Picker(selection: $viewModel.displayElement, label: Spacer()) {
@@ -39,7 +39,7 @@ struct ContentView: View {
                     }                    
                 }
                 .pickerStyle(SegmentedPickerStyle())
-                .frame(width: 200)
+                .frame(width: 250)
                 
                 // 再読み込み
                 Button(action: {

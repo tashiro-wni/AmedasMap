@@ -15,7 +15,7 @@ struct MapView: UIViewRepresentable {
     @ObservedObject var viewModel: AmedasMapViewModel
     
     func makeUIView(context: Context) -> MKMapView {
-        LOG(#function)
+        //LOG(#function)
         mapView.delegate = viewModel
         mapView.mapType = .mutedStandard
         mapView.isPitchEnabled = false
@@ -28,7 +28,7 @@ struct MapView: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: MKMapView, context: Context) {
-        LOG(#function)
+        //LOG(#function)
         viewModel.updateAnnotations(mapView: mapView)
     }
 }
