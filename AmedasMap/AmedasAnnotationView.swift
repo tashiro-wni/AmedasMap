@@ -69,20 +69,19 @@ extension AmedasData {
         case .temperature:
             guard let temperature = temperature else { return nil }
             switch temperature {
-            case  35 ... 50:  colorIndex = 9
-            case  30 ..< 35:  colorIndex = 8
-            case  25 ..< 30:  colorIndex = 7
-            case  20 ..< 25:  colorIndex = 6
-            case  15 ..< 20:  colorIndex = 5
-            case  10 ..< 15:  colorIndex = 4
-            case   5 ..< 10:  colorIndex = 3
-            case   0 ..< 5:   colorIndex = 2
-            case -10 ..< 0:   colorIndex = 1
-            case -50 ..< -10: colorIndex = 0
+            case  35 ... 100:  colorIndex = 9
+            case  30 ..<  35:  colorIndex = 8
+            case  25 ..<  30:  colorIndex = 7
+            case  20 ..<  25:  colorIndex = 6
+            case  15 ..<  20:  colorIndex = 5
+            case  10 ..<  15:  colorIndex = 4
+            case   5 ..<  10:  colorIndex = 3
+            case   0 ..<   5:  colorIndex = 2
+            case -10 ..<   0:  colorIndex = 1
+            case -99 ..< -10:  colorIndex = 0
             default:  return nil
             }
             ary = [ element.iconShape.rawValue, colors[colorIndex] ]
-
 
         case .precipitation:
             guard let precipitation1h = precipitation1h else { return nil }

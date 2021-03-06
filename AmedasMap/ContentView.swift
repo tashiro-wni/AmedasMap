@@ -7,7 +7,20 @@
 
 import SwiftUI
 
+extension AmedasElement {
+    var image: Image {
+        switch self {
+        case .temperature:    return Image(systemName: "thermometer")
+        case .precipitation:  return Image(systemName: "cloud.rain")
+        case .wind:           return Image(systemName: "wind")
+        case .sun:            return Image(systemName: "sun.max")
+        case .humidity:       return Image(systemName: "drop")
+        }
+    }
+}
+
 struct ContentView: View {
+    //@ObservedObject var viewModel = AmedasMapViewModel()
     @State var viewModel = AmedasMapViewModel()
 
     var body: some View {
@@ -21,11 +34,9 @@ struct ContentView: View {
 
                 // 表示要素を選択
                 Picker(selection: $viewModel.displayElement, label: Spacer()) {
-                    Image(systemName: "thermometer").tag(AmedasElement.temperature)
-                    Image(systemName: "cloud.rain").tag(AmedasElement.precipitation)
-                    Image(systemName: "sun.max").tag(AmedasElement.sun)
-                    Image(systemName: "wind").tag(AmedasElement.wind)
-                    Image(systemName: "drop").tag(AmedasElement.humidity)
+                    ForEach(AmedasElement.allCases, id: \.self) { element in
+                        element.image
+                    }                    
                 }
                 .pickerStyle(SegmentedPickerStyle())
                 .frame(width: 200)
@@ -47,7 +58,7 @@ struct ContentView: View {
         }
         .alert(isPresented: $viewModel.hasError) {
             // エラー時にはAlertを表示する
-            Alert(title: Text(viewModel.errorMessage ?? ""))
+            Alert(title: Text(viewModel.errorMessage))
         }
     }
 }

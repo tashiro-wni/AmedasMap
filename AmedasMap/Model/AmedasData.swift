@@ -22,6 +22,7 @@ struct AmedasData: CustomStringConvertible {
     let sun1h: Double?
     let humidity: Double?
 
+    private let invalidText = "-"
     private let directionText = [ "静穏", "北北東", "北東", "東北東", "東",
                                   "東南東", "南東", "南南東", "南",
                                   "南南西", "南西", "西南西", "西",
@@ -60,28 +61,28 @@ struct AmedasData: CustomStringConvertible {
     }
     
     private var temperatureText: String {
-        guard let temperature = temperature else { return "-" }
+        guard let temperature = temperature else { return invalidText }
         return String(format: "%.1f℃", temperature)
     }
 
     private var precipitationText: String {
-        guard let precipitation = precipitation1h else { return "-" }
+        guard let precipitation = precipitation1h else { return invalidText }
         return String(format: "%.1fmm/h", precipitation)
     }
 
     private var windText: String {
         guard let windDir = windDirection, windDir >= 0, windDir < directionText.count,
-              let windSpeed = windSpeed else { return "-" }
+              let windSpeed = windSpeed else { return invalidText }
         return String(format: "%@ %.1fm/s", directionText[windDir], windSpeed)
     }
     
     private var sunText: String {
-        guard let sun1h = sun1h else { return "-" }
+        guard let sun1h = sun1h else { return invalidText }
         return String(format: "%.0fmin", sun1h * 60)
     }
     
     private var humidityText: String {
-        guard let humidity = humidity else { return "-" }
+        guard let humidity = humidity else { return invalidText }
         return String(format: "%.0f%%", humidity)
     }
 
@@ -114,7 +115,7 @@ struct AmedasDataLoader {
     private let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyyMMddHHmm"
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.locale = LocalePOSIX
         dateFormatter.timeZone = TimeZoneJST
         return dateFormatter
     }()

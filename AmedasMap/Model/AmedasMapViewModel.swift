@@ -13,8 +13,18 @@ final class AmedasMapViewModel: NSObject, ObservableObject {
     @Published private(set) var amedasPoints: [String: AmedasPoint] = [:]
     @Published private(set) var amedasData: [AmedasData] = []
     @Published private(set) var date: Date?
-    @Published private(set) var dateText = "Loading..."
-    @Published private(set) var errorMessage: String?
+    var dateText: String {
+        if let date = date {
+            return dateFormatter.string(from: date)
+        } else {
+            return "Loading..."
+        }
+    }
+    @Published private(set) var errorMessage = "" {
+        didSet {
+            hasError = !errorMessage.isEmpty
+        }
+    }
     @Published var hasError = false
     @Published var displayElement: AmedasElement = .temperature
 
@@ -23,7 +33,7 @@ final class AmedasMapViewModel: NSObject, ObservableObject {
     private let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "M/d HH:mm"
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.locale = LocalePOSIX
         dateFormatter.timeZone = TimeZoneJST
         return dateFormatter
     }()
@@ -37,8 +47,7 @@ final class AmedasMapViewModel: NSObject, ObservableObject {
     
     // 地点リストを読み込み
     private func loadPoints() {
-        errorMessage = nil
-        hasError = false
+        errorMessage = ""
 
         AmedasTableLoader().load() { [weak self] result in
             DispatchQueue.main.async { [weak self] in
@@ -49,7 +58,6 @@ final class AmedasMapViewModel: NSObject, ObservableObject {
                     
                 case .failure:
                     self?.errorMessage = "データが読み込めませんでした。"
-                    self?.hasError = true
                 }
             }
         }
@@ -58,22 +66,19 @@ final class AmedasMapViewModel: NSObject, ObservableObject {
     // 最新の観測データを読み込み
     func loadData() {
         LOG(#function)
-        errorMessage = nil
-        hasError = false
+        errorMessage = ""
 
         AmedasDataLoader().load() { [weak self] result in
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 switch result {
                 case .success(let data):
-                    LOG("update amedasData \(data.data.count) points.")
+                    LOG("update amedasData \(self.dateText), \(data.data.count) points.")
                     self.amedasData = data.data
                     self.date = data.date
-                    self.dateText = self.dateFormatter.string(from: data.date)
-                    LOG("date: \(self.dateText)")
+                    //self.dateText = self.dateFormatter.string(from: data.date)
                 case .failure:
                     self.errorMessage = "データが読み込めませんでした。"
-                    self.hasError = true
                 }
             }
         }

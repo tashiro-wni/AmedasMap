@@ -16,6 +16,7 @@ public func LOG(_ body: String, filename: String = #file, line: Int = #line) {
     #endif
 }
 
+let LocalePOSIX = Locale(identifier: "en_US_POSIX")
 let TimeZoneJST = TimeZone(identifier: "JST")
 
 typealias ColorString = String
