@@ -10,10 +10,9 @@ import MapKit
 
 struct MapView: UIViewRepresentable {
     typealias UIViewType = MKMapView
+    private let mapView = MKMapView()
 
     @ObservedObject var viewModel: AmedasMapViewModel
-
-    private let mapView = MKMapView()
     
     func makeUIView(context: Context) -> MKMapView {
         LOG(#function)
@@ -23,9 +22,7 @@ struct MapView: UIViewRepresentable {
         mapView.isRotateEnabled = false
         mapView.region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 35.681, longitude: 139.767),
                                             span: MKCoordinateSpan(latitudeDelta: 5.0, longitudeDelta: 5.0))
-        for identifier in AmedasData.allIdentifiers {
-            mapView.register(AmedasAnnotationView.self, forAnnotationViewWithReuseIdentifier: identifier)
-        }
+        viewModel.registerAnnotationViews(mapView: mapView)
         
         return mapView
     }

@@ -22,8 +22,10 @@ struct ContentView: View {
                 // 表示要素を選択
                 Picker(selection: $viewModel.displayElement, label: Spacer()) {
                     Image(systemName: "thermometer").tag(AmedasElement.temperature)
-                    Image(systemName: "drop").tag(AmedasElement.precipitation)
+                    Image(systemName: "cloud.rain").tag(AmedasElement.precipitation)
+                    Image(systemName: "sun.max").tag(AmedasElement.sun)
                     Image(systemName: "wind").tag(AmedasElement.wind)
+                    Image(systemName: "drop").tag(AmedasElement.humidity)
                 }
                 .pickerStyle(SegmentedPickerStyle())
                 .frame(width: 200)

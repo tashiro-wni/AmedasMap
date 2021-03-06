@@ -7,6 +7,7 @@
 
 import Foundation
 
+// MARK: - AmedasPoint
 struct AmedasPoint: CustomStringConvertible {
     let pointID: String
     let pointNameJa: String
@@ -19,6 +20,7 @@ struct AmedasPoint: CustomStringConvertible {
     }
 }
 
+// MARK: - AmedasTableLoader
 struct AmedasTableLoader {
     enum LoadError: Error {
         case wrongUrl

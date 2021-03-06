@@ -7,10 +7,11 @@
 
 import Foundation
 
-enum AmedasElement {
-    case temperature, precipitation, wind
+enum AmedasElement: CaseIterable {
+    case temperature, precipitation, wind, sun, humidity
 }
 
+// MARK: - AmedasData
 struct AmedasData: CustomStringConvertible {
     let pointID: String
     let temperature: Double?
@@ -18,7 +19,14 @@ struct AmedasData: CustomStringConvertible {
     let precipitation10m: Double?
     let windDirection: Int?
     let windSpeed: Double?
-    
+    let sun1h: Double?
+    let humidity: Double?
+
+    private let directionText = [ "静穏", "北北東", "北東", "東北東", "東",
+                                  "東南東", "南東", "南南東", "南",
+                                  "南南西", "南西", "西南西", "西",
+                                  "西北西", "北西", "北北西", "北" ]
+
     func hasValidData(for element: AmedasElement) -> Bool {
         switch element {
         case .temperature:
@@ -29,39 +37,68 @@ struct AmedasData: CustomStringConvertible {
         case .wind:
             guard let windDirection = windDirection, windDirection >= 0, windDirection < directionText.count else { return false }
             return windSpeed != nil
+        case .sun:
+            return sun1h != nil
+        case .humidity:
+            return humidity != nil
         }
     }
 
-    var temperatureText: String {
+    func text(for element: AmedasElement) -> String {
+        switch element {
+        case .temperature:
+            return temperatureText
+        case .precipitation:
+            return precipitationText
+        case .wind:
+            return windText
+        case .sun:
+            return sunText
+        case .humidity:
+            return humidityText
+        }
+    }
+    
+    private var temperatureText: String {
         guard let temperature = temperature else { return "-" }
         return String(format: "%.1f℃", temperature)
     }
 
-    var precipitationText: String {
+    private var precipitationText: String {
         guard let precipitation = precipitation1h else { return "-" }
         return String(format: "%.1fmm/h", precipitation)
     }
-    
-    let directionText = [ "静穏", "北北東", "北東", "東北東", "東",
-                          "東南東", "南東", "南南東", "南",
-                          "南南西", "南西", "西南西", "西",
-                          "西北西", "北西", "北北西", "北" ]
-    var windText: String {
+
+    private var windText: String {
         guard let windDir = windDirection, windDir >= 0, windDir < directionText.count,
               let windSpeed = windSpeed else { return "-" }
         return String(format: "%@ %.1fm/s", directionText[windDir], windSpeed)
     }
     
+    private var sunText: String {
+        guard let sun1h = sun1h else { return "-" }
+        return String(format: "%.0fmin", sun1h * 60)
+    }
+    
+    private var humidityText: String {
+        guard let humidity = humidity else { return "-" }
+        return String(format: "%.0f%%", humidity)
+    }
+
     var description: String {
         var ary: [String] = []
         ary.append(pointID)
         ary.append("temp:" + temperatureText)
         ary.append("prec:" + precipitationText)
         ary.append("wind:" + windText)
+        ary.append("sun:" + sunText)
+        ary.append("hum:" + humidityText)
+
         return ary.joined(separator: ", ")
     }
 }
 
+// MARK: - AmedasDataLoader
 struct AmedasDataLoader {
     struct AmedasReult {
         let date: Date
@@ -147,12 +184,14 @@ struct AmedasDataLoader {
 
         var list: [AmedasData] = []
         for item in json {
-            let obs = AmedasData(pointID: item.key,
-                                 temperature: parseDouble(item.value["temp"]),
-                                 precipitation1h: parseDouble(item.value["precipitation1h"]),
+            let obs = AmedasData(pointID:          item.key,
+                                 temperature:      parseDouble(item.value["temp"]),
+                                 precipitation1h:  parseDouble(item.value["precipitation1h"]),
                                  precipitation10m: parseDouble(item.value["precipitation10m"]),
-                                 windDirection: parseInt(item.value["windDirection"]),
-                                 windSpeed: parseDouble(item.value["wind"]))
+                                 windDirection:    parseInt(item.value["windDirection"]),
+                                 windSpeed:        parseDouble(item.value["wind"]),
+                                 sun1h:            parseDouble(item.value["sun1h"]),
+                                 humidity:         parseDouble(item.value["humidity"]))
             list.append(obs)
         }
         return list
