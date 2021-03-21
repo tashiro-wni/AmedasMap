@@ -1,0 +1,30 @@
+name: AmedasMap
+options:
+  deploymentTarget:
+    iOS: "14.0"
+  bundleIdPrefix: jp.tasshy
+
+settings:
+  base:
+    DEVELOPMENT_TEAM: 97JN7SJ3KH
+
+targets:
+  AmedasMap:
+    platform: iOS
+    type: application
+    sources:
+      - AmedasMap
+
+
+  AmedasMapTests:
+    platform: iOS
+    type: bundle.unit-test
+    sources:
+      - AmedasMapTests
+
+  AmedasMapUITests:
+    platform: iOS
+    type: bundle.ui-testing
+    sources:
+      - AmedasMapUITests
+
