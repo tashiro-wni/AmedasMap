@@ -10,21 +10,25 @@ settings:
 
 targets:
   AmedasMap:
-    platform: iOS
     type: application
+    platform: iOS
     sources:
       - AmedasMap
 
 
   AmedasMapTests:
-    platform: iOS
     type: bundle.unit-test
+    platform: iOS
     sources:
       - AmedasMapTests
+    dependencies:
+      - target: AmedasMap
 
   AmedasMapUITests:
-    platform: iOS
     type: bundle.ui-testing
+    platform: iOS
     sources:
       - AmedasMapUITests
+    dependencies:
+      - target:	AmedasMap
 
