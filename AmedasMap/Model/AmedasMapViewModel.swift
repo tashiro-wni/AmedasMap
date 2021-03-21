@@ -108,8 +108,23 @@ final class AmedasMapViewModel: NSObject, ObservableObject {
 extension AmedasMapViewModel: MKMapViewDelegate {
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         guard let amedas = annotation as? AmedasAnnotation,
-              let reuseIdentifier = amedas.amedasData.reuseIdentifier(for: displayElement) else { return nil }
-        
-        return mapView.dequeueReusableAnnotationView(withIdentifier: reuseIdentifier, for: annotation)
+              let reuseIdentifier = amedas.amedasData.reuseIdentifier(for: displayElement),
+              let view = mapView.dequeueReusableAnnotationView(withIdentifier: reuseIdentifier, for: annotation) as? AmedasAnnotationView else { return nil }
+
+        view.point = amedas.point
+        return view
     }
+    
+    func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
+        guard let amedasView = view as? AmedasAnnotationView,
+              let point = amedasView.point else { return }
+        LOG(#function + ", \(point.pointNameJa)")
+    }
+    
+    func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
+        guard let amedasView = view as? AmedasAnnotationView,
+              let point = amedasView.point else { return }
+        LOG(#function + ", \(point.pointNameJa)")
+    }
+    
 }

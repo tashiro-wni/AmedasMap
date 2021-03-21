@@ -135,10 +135,12 @@ extension AmedasData {
 
 // MARK: - AmedasAnnotation
 final class AmedasAnnotation: MKPointAnnotation {
+    let point: AmedasPoint
     let amedasData: AmedasData
     let element: AmedasElement
     
     init(point: AmedasPoint, data: AmedasData, element: AmedasElement) {
+        self.point = point
         amedasData = data
         self.element = element
         super.init()
@@ -153,6 +155,8 @@ final class AmedasAnnotationView: MKAnnotationView {
     private let size = CGSize(width: 15, height: 15)
     private let borderColor = UIColor.white
     override var alignmentRectInsets: UIEdgeInsets { .zero }
+    
+    var point: AmedasPoint?
 
     override init(annotation: MKAnnotation?, reuseIdentifier: String?) {
         super.init(annotation: annotation, reuseIdentifier: reuseIdentifier)
