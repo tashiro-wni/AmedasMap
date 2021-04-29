@@ -20,8 +20,7 @@ private extension AmedasElement {
 }
 
 struct ContentView: View {
-    //@ObservedObject var viewModel = AmedasMapViewModel()
-    @State var viewModel = AmedasMapViewModel()
+    @StateObject var viewModel = AmedasMapViewModel()
 
     var body: some View {
         ZStack {
@@ -30,10 +29,10 @@ struct ContentView: View {
                         
             HStack {
                 // データの時刻
-                //Text(viewModel.dateText)
+                Text(viewModel.dateText)
 
                 // 表示要素を選択
-                Picker(selection: $viewModel.displayElement, label: Spacer()) {
+                Picker(selection: $viewModel.displayElement, label: EmptyView()) {
                     ForEach(AmedasElement.allCases, id: \.self) { element in
                         element.image
                     }                    
