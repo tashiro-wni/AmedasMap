@@ -29,7 +29,7 @@ final class AmedasMapViewModel: NSObject, ObservableObject {
     
     private let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "M/d HH:mm"
+        dateFormatter.dateFormat = "yyyy/M/d HH:mm"
         dateFormatter.locale = LocalePOSIX
         dateFormatter.timeZone = TimeZoneJST
         return dateFormatter

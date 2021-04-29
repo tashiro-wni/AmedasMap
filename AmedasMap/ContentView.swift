@@ -27,10 +27,24 @@ struct ContentView: View {
             MapView(viewModel: viewModel)
                 .edgesIgnoringSafeArea(.all)
                         
-            HStack {
-                // データの時刻
-                Text(viewModel.dateText)
-
+            VStack {
+                HStack(spacing: 10) {
+                    // データの時刻
+                    Text(viewModel.dateText)
+                    
+                    // 再読み込み
+                    Button(action: {
+                        viewModel.loadData()
+                    }, label: {
+                        Image(systemName: "gobackward")
+                            .resizable()
+                            .padding(8)
+                            .frame(width: 30, height: 30)
+                            .background(Color.white)
+                            .cornerRadius(4)
+                    })
+                }
+                
                 // 表示要素を選択
                 Picker(selection: $viewModel.displayElement, label: EmptyView()) {
                     ForEach(AmedasElement.allCases, id: \.self) { element in
@@ -39,18 +53,6 @@ struct ContentView: View {
                 }
                 .pickerStyle(SegmentedPickerStyle())
                 .frame(width: 250)
-                
-                // 再読み込み
-                Button(action: {
-                    viewModel.loadData()
-                }, label: {
-                    Image(systemName: "gobackward")
-                        .resizable()
-                        .padding(8)
-                        .frame(width: 30, height: 30)
-                        .background(Color.white)
-                        .cornerRadius(4)
-                })
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
             .padding(24)
