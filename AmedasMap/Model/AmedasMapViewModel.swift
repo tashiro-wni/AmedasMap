@@ -8,7 +8,7 @@
 import Foundation
 
 // MARK: - AmedasMapViewModel
-final class AmedasMapViewModel: NSObject, ObservableObject {
+final class AmedasMapViewModel: ObservableObject {
     @Published private(set) var amedasPoints: [String: AmedasPoint] = [:]
     @Published private(set) var amedasData: [AmedasData] = []
     @Published private(set) var date: Date?
@@ -36,8 +36,7 @@ final class AmedasMapViewModel: NSObject, ObservableObject {
     }()
     
     // MARK: -
-    override init() {
-        super.init()
+    init() {
         loadPoints()
         loadData()
     }

@@ -20,6 +20,7 @@ private extension AmedasElement {
 }
 
 struct ContentView: View {
+    @Environment(\.scenePhase) private var phase
     @StateObject var viewModel = AmedasMapViewModel()
 
     var body: some View {
@@ -60,6 +61,12 @@ struct ContentView: View {
         .alert(isPresented: $viewModel.hasError) {
             // エラー時にはAlertを表示する
             Alert(title: Text(viewModel.errorMessage))
+        }
+        .onChange(of: phase) { newPhase in
+            if newPhase == .active {
+                LOG("scenePhase changed ACTIVE!!")
+                viewModel.loadData()
+            }
         }
     }
 }
