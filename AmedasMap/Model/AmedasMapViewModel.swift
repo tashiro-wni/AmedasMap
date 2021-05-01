@@ -19,12 +19,10 @@ final class AmedasMapViewModel: ObservableObject {
             return "Loading..."
         }
     }
-    @Published private(set) var errorMessage = "" {
-        didSet {
-            hasError = !errorMessage.isEmpty
-        }
-    }
     @Published var hasError = false
+    var errorMessage: String {
+        hasError ? "データが読み込めませんでした。" : ""
+    }
     @Published var displayElement: AmedasElement = .temperature
     
     private let dateFormatter: DateFormatter = {
@@ -43,7 +41,7 @@ final class AmedasMapViewModel: ObservableObject {
     
     // 地点リストを読み込み
     private func loadPoints() {
-        errorMessage = ""
+        hasError = false
 
         AmedasTableLoader().load() { [weak self] result in
             DispatchQueue.main.async { [weak self] in
@@ -53,7 +51,7 @@ final class AmedasMapViewModel: ObservableObject {
                     self?.amedasPoints = points
                     
                 case .failure:
-                    self?.errorMessage = "データが読み込めませんでした。"
+                    self?.hasError = true
                 }
             }
         }
@@ -62,7 +60,7 @@ final class AmedasMapViewModel: ObservableObject {
     // 最新の観測データを読み込み
     func loadData() {
         LOG(#function)
-        errorMessage = ""
+        hasError = false
 
         AmedasDataLoader().load() { [weak self] result in
             DispatchQueue.main.async { [weak self] in
@@ -74,7 +72,7 @@ final class AmedasMapViewModel: ObservableObject {
                     LOG("update amedasData \(self.dateText), \(data.data.count) points.")
 
                 case .failure:
-                    self.errorMessage = "データが読み込めませんでした。"
+                    self.hasError = true
                 }
             }
         }
