@@ -88,7 +88,7 @@ struct ContentView: View {
                         ElementPicker(viewModel: viewModel)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
-                    .padding(24)
+                    .padding(8)
                 }
             }
         }
