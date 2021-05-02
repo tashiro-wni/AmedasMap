@@ -19,44 +19,78 @@ private extension AmedasElement {
     }
 }
 
+// MARK: - ElementPicker 表示要素を選択
+private struct ElementPicker: View {
+    @StateObject var viewModel: AmedasMapViewModel
+    
+    var body: some View {
+        Picker(selection: $viewModel.displayElement, label: EmptyView()) {
+            ForEach(AmedasElement.allCases, id: \.self) { element in
+                element.image
+            }
+        }
+        .pickerStyle(SegmentedPickerStyle())
+        .frame(width: 250)
+    }
+}
+
+// MARK: - TimestampView データの時刻, 再読み込みボタン
+private struct TimestampView: View {
+    @StateObject var viewModel: AmedasMapViewModel
+
+    var body: some View {
+        HStack(spacing: 10) {
+            // データの時刻
+            Text(viewModel.dateText)
+            
+            // 再読み込みボタン
+            Button(action: {
+                viewModel.loadData()
+            }, label: {
+                Image(systemName: "gobackward")
+                    .resizable()
+                    .padding(8)
+                    .frame(width: 30, height: 30)
+                    .background(Color.white)
+                    .cornerRadius(4)
+            })
+        }
+    }
+}
+
+// MARK: - ContentView
 struct ContentView: View {
     @Environment(\.scenePhase) private var phase
-    @StateObject var viewModel = AmedasMapViewModel()
+    @StateObject private var viewModel = AmedasMapViewModel()
 
     var body: some View {
         ZStack {
             MapView(viewModel: viewModel)
                 .edgesIgnoringSafeArea(.all)
+                  
+            GeometryReader { geometry in
+                if geometry.size.width < 500 {
+                    VStack {
+                        // 時刻・再読み込みボタン
+                        TimestampView(viewModel: viewModel)
                         
-            VStack {
-                HStack(spacing: 10) {
-                    // データの時刻
-                    Text(viewModel.dateText)
-                    
-                    // 再読み込み
-                    Button(action: {
-                        viewModel.loadData()
-                    }, label: {
-                        Image(systemName: "gobackward")
-                            .resizable()
-                            .padding(8)
-                            .frame(width: 30, height: 30)
-                            .background(Color.white)
-                            .cornerRadius(4)
-                    })
+                        // 表示要素を選択
+                        ElementPicker(viewModel: viewModel)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                    .padding(24)
+                } else {
+                    HStack {
+                        // 時刻・再読み込みボタン
+                        TimestampView(viewModel: viewModel)
+                        
+                        // 表示要素を選択
+                        ElementPicker(viewModel: viewModel)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                    .padding(24)
                 }
-                
-                // 表示要素を選択
-                Picker(selection: $viewModel.displayElement, label: EmptyView()) {
-                    ForEach(AmedasElement.allCases, id: \.self) { element in
-                        element.image
-                    }                    
-                }
-                .pickerStyle(SegmentedPickerStyle())
-                .frame(width: 250)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
-            .padding(24)
         }
         .alert(isPresented: $viewModel.hasError) {
             // エラー時にはAlertを表示する
