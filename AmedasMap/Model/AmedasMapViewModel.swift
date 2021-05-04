@@ -24,6 +24,16 @@ final class AmedasMapViewModel: ObservableObject {
         hasError ? "データが読み込めませんでした。" : ""
     }
     @Published var displayElement: AmedasElement = .temperature
+    @Published var selectedPointData: [AmedasData] = [] {
+        didSet {
+            for item in selectedPointData {
+                self.dateFormatter.dateFormat = "M/dd H:mm"
+                LOG("point: \(item.pointID), "
+                        + self.dateFormatter.string(from: Date(timeIntervalSince1970: item.time))
+                        + "temp: " + item.text(for: .temperature))
+            }
+        }
+    }
     
     private let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
@@ -32,11 +42,12 @@ final class AmedasMapViewModel: ObservableObject {
         dateFormatter.timeZone = TimeZoneJST
         return dateFormatter
     }()
+    private let loader = AmedasDataLoader()
     
     // MARK: -
     init() {
         loadPoints()
-        loadData()
+        loadMapData()
     }
     
     // 地点リストを読み込み
@@ -58,11 +69,11 @@ final class AmedasMapViewModel: ObservableObject {
     }
     
     // 最新の観測データを読み込み
-    func loadData() {
+    func loadMapData() {
         LOG(#function)
         hasError = false
 
-        AmedasDataLoader().load() { [weak self] result in
+        loader.load() { [weak self] result in
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 switch result {
@@ -71,6 +82,23 @@ final class AmedasMapViewModel: ObservableObject {
                     self.date = data.date
                     LOG("update amedasData \(self.dateText), \(data.data.count) points.")
 
+                case .failure:
+                    self.hasError = true
+                }
+            }
+        }
+    }
+    
+    // 指定地点の時系列データを読み込み
+    func loadPointData(_ point: String) {
+        LOG(#function + ", point:\(point)")
+        guard let date = date else { return }
+        loader.load(point: point, date: date) { result in
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                switch result {
+                case .success(let data):
+                    self.selectedPointData = data                
                 case .failure:
                     self.hasError = true
                 }

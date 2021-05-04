@@ -14,6 +14,7 @@ enum AmedasElement: CaseIterable {
 // MARK: - AmedasData
 struct AmedasData: CustomStringConvertible {
     let pointID: String
+    let time: TimeInterval
     let temperature: Double?
     let precipitation1h: Double?
     let precipitation10m: Double?
@@ -89,6 +90,7 @@ struct AmedasData: CustomStringConvertible {
     var description: String {
         var ary: [String] = []
         ary.append(pointID)
+        ary.append("time:\(time)")
         ary.append("temp:" + temperatureText)
         ary.append("prec:" + precipitationText)
         ary.append("wind:" + windText)
@@ -101,7 +103,7 @@ struct AmedasData: CustomStringConvertible {
 
 // MARK: - AmedasDataLoader
 struct AmedasDataLoader {
-    struct AmedasReult {
+    struct AmedasMapReult {
         let date: Date
         let data: [AmedasData]
     }
@@ -121,7 +123,7 @@ struct AmedasDataLoader {
     }()
     
     // 最新データの時刻を取得
-    func load(completion: @escaping (Result<AmedasReult, LoadError>) -> Void) {
+    func load(completion: @escaping (Result<AmedasMapReult, LoadError>) -> Void) {
         guard let url = URL(string: API.amedasLatestTime) else {
             completion(.failure(.wrongUrl))
             return
@@ -152,7 +154,8 @@ struct AmedasDataLoader {
     }
   
     // 指定時刻の観測値一覧を取得
-    private func load(date: Date, completion: @escaping (Result<AmedasReult, LoadError>) -> Void) {
+    private func load(date: Date, completion: @escaping (Result<AmedasMapReult, LoadError>) -> Void) {
+        dateFormatter.dateFormat = "yyyyMMddHHmm"
         let urlString = String(format: API.amedasMapData, dateFormatter.string(from: date))
         guard let url = URL(string: urlString) else {
             completion(.failure(.wrongUrl))
@@ -167,18 +170,18 @@ struct AmedasDataLoader {
                 return
             }
             
-            guard let list = parseAmedasData(data: data) else {
+            guard let list = parseAmedasMapData(data: data, date: date) else {
                 LOG("json parse error.")
                 completion(.failure(.parseError))
                 return
             }
             
-            completion(.success(AmedasReult(date: date, data: list)))
+            completion(.success(AmedasMapReult(date: date, data: list)))
         }
         task.resume()
     }
     
-    func parseAmedasData(data: Data) -> [AmedasData]? {
+    func parseAmedasMapData(data: Data, date: Date) -> [AmedasData]? {
         guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: [String: Any]] else {
             return nil
         }
@@ -186,6 +189,87 @@ struct AmedasDataLoader {
         var list: [AmedasData] = []
         for item in json {
             let obs = AmedasData(pointID:          item.key,
+                                 time:             date.timeIntervalSince1970,
+                                 temperature:      parseDouble(item.value["temp"]),
+                                 precipitation1h:  parseDouble(item.value["precipitation1h"]),
+                                 precipitation10m: parseDouble(item.value["precipitation10m"]),
+                                 windDirection:    parseInt(item.value["windDirection"]),
+                                 windSpeed:        parseDouble(item.value["wind"]),
+                                 sun1h:            parseDouble(item.value["sun1h"]),
+                                 humidity:         parseDouble(item.value["humidity"]))
+            list.append(obs)
+        }
+        return list
+    }
+
+    // 指定地点の時系列観測値(過去24時間分)を取得
+    func load(point: String, date: Date, completion: @escaping (Result<[AmedasData], LoadError>) -> Void) {
+        let tm0 = floor(date.timeIntervalSince1970 / 10800) * 10800
+        var allData: [AmedasData] = []
+        var loading = 0
+        
+        for i in 0...8 {
+            let tm = tm0 - Double(10800 * i)
+            loading += 1
+            loadPointFile(point: point, date: Date(timeIntervalSince1970: tm)) { result in
+                loading -= 1
+                switch result {
+                case .failure:
+                    break
+                case .success(let list):
+                    allData.append(contentsOf: list)
+                }
+                if loading == 0 {
+                    if allData.isEmpty {
+                        completion(.failure(.parseError))
+                    } else {
+                        // 全ての読み込みが完了したら、時系列にsortして返す
+                        completion(.success(allData.sorted(by: {$0.time < $1.time})))
+                    }
+                }
+            }
+        }
+    }
+    
+    // 指定地点の時系列観測値(1ファイル、最大3時間分)を取得
+    private func loadPointFile(point: String, date: Date, completion: @escaping (Result<[AmedasData], LoadError>) -> Void) {
+        dateFormatter.dateFormat = "yyyyMMdd_HH"
+        let urlString = String(format: API.amedasPointData, point, dateFormatter.string(from: date))
+        guard let url = URL(string: urlString) else {
+            completion(.failure(.wrongUrl))
+            return
+        }
+
+        LOG("load: " + urlString)
+        let task = URLSession.shared.dataTask(with: url) { (data, _, error) in
+            guard let data = data, error == nil else {
+                LOG("http error.")
+                completion(.failure(.httpError))
+                return
+            }
+            
+            guard let list = parseAmedasPointData(data: data, point: point) else {
+                LOG("json parse error.")
+                completion(.failure(.parseError))
+                return
+            }
+            
+            completion(.success(list))
+        }
+        task.resume()
+    }
+
+    private func parseAmedasPointData(data: Data, point: String) -> [AmedasData]? {
+        guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: [String: Any]] else {
+            return nil
+        }
+
+        dateFormatter.dateFormat = "yyyyMMddHHmmss"
+        var list: [AmedasData] = []
+        for item in json {
+            guard let date = dateFormatter.date(from: item.key) else { continue }
+            let obs = AmedasData(pointID:          point,
+                                 time:             date.timeIntervalSince1970,
                                  temperature:      parseDouble(item.value["temp"]),
                                  precipitation1h:  parseDouble(item.value["precipitation1h"]),
                                  precipitation10m: parseDouble(item.value["precipitation10m"]),

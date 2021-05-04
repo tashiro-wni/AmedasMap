@@ -45,7 +45,7 @@ private struct TimestampView: View {
             
             // 再読み込みボタン
             Button(action: {
-                viewModel.loadData()
+                viewModel.loadMapData()
             }, label: {
                 Image(systemName: "gobackward")
                     .resizable()
@@ -99,7 +99,7 @@ struct ContentView: View {
         .onChange(of: phase) { newPhase in
             if newPhase == .active {
                 LOG("scenePhase changed ACTIVE!!")
-                viewModel.loadData()
+                viewModel.loadMapData()
             }
         }
     }
