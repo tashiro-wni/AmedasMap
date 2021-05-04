@@ -81,14 +81,13 @@ struct MapView: UIViewRepresentable {
             guard let amedasView = view as? AmedasAnnotationView,
                   let point = amedasView.point else { return }
             LOG(#function + ", \(point.pointNameJa)")
-            
-            parent.viewModel.loadPointData(point.pointID)
         }
         
         func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
             guard let amedasView = view as? AmedasAnnotationView,
                   let point = amedasView.point else { return }
             LOG(#function + ", \(point.pointNameJa)")
+            parent.viewModel.loadPointData(point.pointID)
         }
     }
 }

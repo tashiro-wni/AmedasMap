@@ -92,6 +92,9 @@ struct ContentView: View {
                 }
             }
         }
+        .sheet(isPresented: $viewModel.showModal) {
+            PointView(viewModel: viewModel)
+        }
         .alert(isPresented: $viewModel.hasError) {
             // エラー時にはAlertを表示する
             Alert(title: Text(viewModel.errorMessage))

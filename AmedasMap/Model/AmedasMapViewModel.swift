@@ -24,14 +24,18 @@ final class AmedasMapViewModel: ObservableObject {
         hasError ? "データが読み込めませんでした。" : ""
     }
     @Published var displayElement: AmedasElement = .temperature
-    @Published var selectedPointData: [AmedasData] = [] {
+    
+    @Published var showModal: Bool = false
+    private(set) var selectedPoint: String = ""
+    private(set) var selectedPointData: [AmedasData] = [] {
         didSet {
-            for item in selectedPointData {
-                self.dateFormatter.dateFormat = "M/dd H:mm"
-                LOG("point: \(item.pointID), "
-                        + self.dateFormatter.string(from: Date(timeIntervalSince1970: item.time))
-                        + "temp: " + item.text(for: .temperature))
-            }
+            showModal = true
+//            for item in selectedPointData {
+//                self.dateFormatter.dateFormat = "M/dd H:mm"
+//                LOG("point: \(item.pointID), "
+//                        + self.dateFormatter.string(from: Date(timeIntervalSince1970: item.time))
+//                        + "temp: " + item.text(for: .temperature))
+//            }
         }
     }
     
@@ -93,6 +97,7 @@ final class AmedasMapViewModel: ObservableObject {
     func loadPointData(_ point: String) {
         LOG(#function + ", point:\(point)")
         guard let date = date else { return }
+        selectedPoint = point
         loader.load(point: point, date: date) { result in
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }

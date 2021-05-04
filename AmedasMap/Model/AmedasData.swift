@@ -12,7 +12,8 @@ enum AmedasElement: CaseIterable {
 }
 
 // MARK: - AmedasData
-struct AmedasData: CustomStringConvertible {
+struct AmedasData: Hashable, CustomStringConvertible {
+    let id = UUID()
     let pointID: String
     let time: TimeInterval
     let temperature: Double?
@@ -23,7 +24,10 @@ struct AmedasData: CustomStringConvertible {
     let sun1h: Double?
     let humidity: Double?
 
-    private let invalidText = "-"
+    var is0min: Bool {  // 00分
+        Int(time).isMultiple(of: 3600)
+    }
+    let invalidText = "-"
     private let directionText = [ "静穏", "北北東", "北東", "東北東", "東",
                                   "東南東", "南東", "南南東", "南",
                                   "南南西", "南西", "西南西", "西",

@@ -163,6 +163,7 @@ final class AmedasAnnotationView: MKAnnotationView {
         canShowCallout = true
         displayPriority = .defaultHigh
         collisionMode = .circle
+        rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
 
         guard let reuseIdentifier = reuseIdentifier else { return }
         let ary = reuseIdentifier.components(separatedBy: ",")
@@ -171,7 +172,7 @@ final class AmedasAnnotationView: MKAnnotationView {
         } else if ary.count == 3, ary[0] == AmedasElement.Shape.arrow.rawValue,
                   let direction = Int(ary[1]), let color = UIColor(hex: ary[2]) {
             drawArrow(direction: direction, color: color)
-        }
+        }        
     }
     
     required init?(coder aDecoder: NSCoder) {
