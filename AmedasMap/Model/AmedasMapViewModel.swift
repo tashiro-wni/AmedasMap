@@ -30,18 +30,12 @@ final class AmedasMapViewModel: ObservableObject {
     private(set) var selectedPointData: [AmedasData] = [] {
         didSet {
             showModal = true
-//            for item in selectedPointData {
-//                self.dateFormatter.dateFormat = "M/dd H:mm"
-//                LOG("point: \(item.pointID), "
-//                        + self.dateFormatter.string(from: Date(timeIntervalSince1970: item.time))
-//                        + "temp: " + item.text(for: .temperature))
-//            }
         }
     }
     
     private let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy/M/d HH:mm"
+        dateFormatter.dateFormat = "yyyy/M/d H:mm"
         dateFormatter.locale = LocalePOSIX
         dateFormatter.timeZone = TimeZoneJST
         return dateFormatter

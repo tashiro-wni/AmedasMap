@@ -24,9 +24,10 @@ struct PointView: View {
                viewModel.selectedPoint) }
 
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             Text(pointName)
                 .font(.title)
+                .padding(16)
             List(viewModel.selectedPointData.reversed().filter{ $0.is0min }.prefix(24), id: \.self) { item in
                 Text(formattedText(item))
                     .lineLimit(1)
