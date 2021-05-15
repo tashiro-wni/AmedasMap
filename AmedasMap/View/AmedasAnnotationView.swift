@@ -29,7 +29,8 @@ extension AmedasData {
     private static let elementColors: [AmedasElement: [ColorString]] = [
         .temperature:   [ "#9522E6", "#B2B2B2", "#3377FF", "#3377FF", "#56C6FF",
                           "#67CC33", "#FFD500", "#FF8800", "#F254B0", "#E60000" ],
-        .precipitation: [ "#999999", "#45A3E5", "#002CB2", "#FFBF00", "#D90000" ],
+        .precipitation: [ "#C0C0C0", "#E0E0E0", "#9AEBFF", "#48E1FF", "#25AEFF",
+                          "#00F42E", "#FAF714", "#FF6666", "#E00000", ],
         .wind:          [ "#999999", "#002CB2", "#5FB235", "#FFBF00", "#FF7F00", "#D90000" ],
         .sun:           [ "#999999", "#FFFF00", "#FFA500" ],
         .humidity:      [ "#999999", "#45A3E5", "#002CB2" ] ]
@@ -86,10 +87,14 @@ extension AmedasData {
         case .precipitation:
             guard let precipitation1h = precipitation1h else { return nil }
             switch precipitation1h {
-            case 32 ... 500:  colorIndex = 4
-            case 16 ..<  32:  colorIndex = 3
-            case  4 ..<  16:  colorIndex = 2
-            case  1 ..<   4:  colorIndex = 1
+            case 99 ... 500:  colorIndex = 8
+            case 64 ...  99:  colorIndex = 7
+            case 32 ...  64:  colorIndex = 6
+            case 16 ..<  32:  colorIndex = 5
+            case  8 ..<  16:  colorIndex = 4
+            case  4 ..<   8:  colorIndex = 3
+            case  2 ..<   4:  colorIndex = 2
+            case  1 ..<   2:  colorIndex = 1
             case  0 ..<   1:  colorIndex = 0
             default:  return nil
             }
