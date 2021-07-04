@@ -45,7 +45,13 @@ final class AmedasMapViewModel: ObservableObject {
     // MARK: -
     init() {
         loadPoints()
-        loadMapData()
+        if #available(iOS 15.0, *) {
+            async {
+                await self.loadMapData2()
+            }
+        } else {
+            loadMapData()
+        }
     }
     
     // 地点リストを読み込み
@@ -87,6 +93,23 @@ final class AmedasMapViewModel: ObservableObject {
         }
     }
     
+    @available(iOS 15.0, *)
+    func loadMapData2() async {
+        LOG(#function)
+        do {
+            let data = try await loader.load()
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.hasError = false
+                self.amedasData = data.data
+                self.date = data.date
+                LOG("update amedasData \(self.dateText), \(data.data.count) points.")
+            }
+        } catch {
+            hasError = true
+        }
+    }
+
     // 指定地点の時系列データを読み込み
     func loadPointData(_ point: String) {
         LOG(#function + ", point:\(point)")
