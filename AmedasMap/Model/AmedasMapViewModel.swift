@@ -44,12 +44,13 @@ final class AmedasMapViewModel: ObservableObject {
     
     // MARK: -
     init() {
-        loadPoints()
         if #available(iOS 15.0, *) {
-            async {
+            Task() {
+                await self.loadPoints2()
                 await self.loadMapData2()
             }
         } else {
+            loadPoints()
             loadMapData()
         }
     }
@@ -72,6 +73,23 @@ final class AmedasMapViewModel: ObservableObject {
         }
     }
     
+    @available(iOS 15.0, *)
+    func loadPoints2() async {
+        LOG(#function)
+        //hasError = false
+        do {
+            let points = try await AmedasTableLoader().load()
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.hasError = false
+                self.amedasPoints = points
+                LOG("update amedasPoints \(points.count) points.")
+            }
+        } catch {
+            hasError = true
+        }
+    }
+
     // 最新の観測データを読み込み
     func loadMapData() {
         LOG(#function)

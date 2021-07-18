@@ -296,6 +296,21 @@ struct AmedasDataLoader {
         task.resume()
     }
 
+//    @available(iOS 15.0, *)
+//    private func loadPointFile(point: String, date: Date) async throws -> [AmedasData] {
+//        dateFormatter.dateFormat = "yyyyMMddHHmm"
+//        let urlString = String(format: API.amedasMapData, dateFormatter.string(from: date))
+//        guard let url = URL(string: urlString) else {
+//            throw LoadError.wrongUrl
+//        }
+//        LOG("load: " + urlString)
+//        let (data, _) = try await URLSession.shared.data(for: URLRequest(url: url))
+//        guard let list = parseAmedasMapData(data: data, date: date) else {
+//            throw LoadError.parseError
+//        }
+//        return list
+//    }
+
     private func parseAmedasPointData(data: Data, point: String) -> [AmedasData]? {
         guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: [String: Any]] else {
             return nil
