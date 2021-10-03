@@ -157,6 +157,24 @@ struct AmedasDataLoader {
         task.resume()
     }
   
+    @available(iOS 15.0, *)
+    func load() async throws -> AmedasMapReult {
+        guard let url = URL(string: API.amedasLatestTime) else {
+            throw LoadError.wrongUrl
+        }
+        LOG("load: " + url.absoluteString)
+        let (data, _) = try await URLSession.shared.data(for: URLRequest(url: url))
+        
+        let formatter = ISO8601DateFormatter()
+        formatter.timeZone = TimeZoneJST
+        
+        guard let text = String(data: data, encoding: .utf8),
+              let date = formatter.date(from: text) else {
+                  throw LoadError.parseError
+              }
+        return try await load(date: date)
+    }
+    
     // 指定時刻の観測値一覧を取得
     private func load(date: Date, completion: @escaping (Result<AmedasMapReult, LoadError>) -> Void) {
         dateFormatter.dateFormat = "yyyyMMddHHmm"
@@ -185,6 +203,21 @@ struct AmedasDataLoader {
         task.resume()
     }
     
+    @available(iOS 15.0, *)
+    private func load(date: Date) async throws -> AmedasMapReult {
+        dateFormatter.dateFormat = "yyyyMMddHHmm"
+        let urlString = String(format: API.amedasMapData, dateFormatter.string(from: date))
+        guard let url = URL(string: urlString) else {
+            throw LoadError.wrongUrl
+        }
+        LOG("load: " + urlString)
+        let (data, _) = try await URLSession.shared.data(for: URLRequest(url: url))
+        guard let list = parseAmedasMapData(data: data, date: date) else {
+            throw LoadError.parseError
+        }
+        return AmedasMapReult(date: date, data: list)
+    }
+
     func parseAmedasMapData(data: Data, date: Date) -> [AmedasData]? {
         guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: [String: Any]] else {
             return nil
@@ -262,6 +295,21 @@ struct AmedasDataLoader {
         }
         task.resume()
     }
+
+//    @available(iOS 15.0, *)
+//    private func loadPointFile(point: String, date: Date) async throws -> [AmedasData] {
+//        dateFormatter.dateFormat = "yyyyMMddHHmm"
+//        let urlString = String(format: API.amedasMapData, dateFormatter.string(from: date))
+//        guard let url = URL(string: urlString) else {
+//            throw LoadError.wrongUrl
+//        }
+//        LOG("load: " + urlString)
+//        let (data, _) = try await URLSession.shared.data(for: URLRequest(url: url))
+//        guard let list = parseAmedasMapData(data: data, date: date) else {
+//            throw LoadError.parseError
+//        }
+//        return list
+//    }
 
     private func parseAmedasPointData(data: Data, point: String) -> [AmedasData]? {
         guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: [String: Any]] else {
