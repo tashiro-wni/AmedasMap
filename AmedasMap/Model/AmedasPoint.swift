@@ -28,37 +28,12 @@ struct AmedasTableLoader {
         case parseError
     }
     
-//    func load(completion: @escaping (Result<[String: AmedasPoint], LoadError>) -> Void) {
-//        guard let url = URL(string: API.amedasPointTable) else {
-//            completion(.failure(.wrongUrl))
-//            return
-//        }
-//
-//        LOG("load: " + url.absoluteString)
-//        let task = URLSession.shared.dataTask(with: url) { (data, _, error) in
-//            guard let data = data, error == nil else {
-//                LOG("http error.")
-//                completion(.failure(.httpError))
-//                return
-//            }
-//
-//            guard let list = parseAmedasTable(data: data) else {
-//                LOG("json parse error.")
-//                completion(.failure(.parseError))
-//                return
-//            }
-//
-//            completion(.success(list))
-//        }
-//        task.resume()
-//    }
-    
     func load() async throws -> [String: AmedasPoint] {
         guard let url = URL(string: API.amedasPointTable) else {
             throw LoadError.wrongUrl
         }
         LOG("load: " + url.absoluteString)
-        let (data, _) = try await URLSession.shared.data(for: URLRequest(url: url))
+        let (data, _) = try await URLSession.shared.data2(from: url)
         
         guard let list = parseAmedasTable(data: data) else {
             LOG("json parse error.")

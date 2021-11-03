@@ -1,7 +1,7 @@
 name: AmedasMap
 options:
   deploymentTarget:
-    iOS: "15.0"
+    iOS: "14.0"
   bundleIdPrefix: com.example
 
 settings:

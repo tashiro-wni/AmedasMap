@@ -57,23 +57,6 @@ final class AmedasMapViewModel: ObservableObject {
     }
     
     // 地点リストを読み込み
-//    private func loadPoints() {
-//        hasError = false
-//
-//        AmedasTableLoader().load() { [weak self] result in
-//            DispatchQueue.main.async { [weak self] in
-//                switch result {
-//                case .success(let points):
-//                    LOG("update amedasPoints \(points.count) points.")
-//                    self?.amedasPoints = points
-//
-//                case .failure:
-//                    self?.hasError = true
-//                }
-//            }
-//        }
-//    }
-    
     @MainActor
     private func loadPoints2() async {
         LOG(#function)
@@ -89,26 +72,6 @@ final class AmedasMapViewModel: ObservableObject {
     }
 
     // 最新の観測データを読み込み
-//    func loadMapData() {
-//        LOG(#function)
-//        hasError = false
-//
-//        loader.load() { [weak self] result in
-//            DispatchQueue.main.async { [weak self] in
-//                guard let self = self else { return }
-//                switch result {
-//                case .success(let data):
-//                    self.amedasData = data.data
-//                    self.date = data.date
-//                    LOG("update amedasData \(self.dateText), \(data.data.count) points.")
-//
-//                case .failure:
-//                    self.hasError = true
-//                }
-//            }
-//        }
-//    }
-    
     @MainActor
     private func loadMapData2() async {
         LOG(#function)
@@ -129,17 +92,7 @@ final class AmedasMapViewModel: ObservableObject {
         LOG(#function + ", point:\(point)")
         guard let date = date else { return }
         selectedPoint = point
-//        loader.load(point: point, date: date) { result in
-//            DispatchQueue.main.async { [weak self] in
-//                guard let self = self else { return }
-//                switch result {
-//                case .success(let data):
-//                    self.selectedPointData = data
-//                case .failure:
-//                    self.hasError = true
-//                }
-//            }
-//        }
+
         Task() {
             do {
                 selectedPointData = try await loader.load(point: point, date: date)
