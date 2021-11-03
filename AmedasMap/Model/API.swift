@@ -18,12 +18,12 @@ enum API {
 // iOS 14 でも URLSession で async/await を使えるようにする
 #if compiler(>=5.5.2) && canImport(_Concurrency)
 extension URLSession {
-    func data2(for request: URLRequest) async throws -> (Data, URLResponse) {
+    func data2(from url: URL) async throws -> (Data, URLResponse) {
         if #available(iOS 15.0, *) {
-            return try await data(for: request)
+            return try await data(from: url)
         } else {
             return try await withCheckedThrowingContinuation { continuation in
-                let task = dataTask(with: request) { data, response, error in
+                let task = dataTask(with: url) { data, response, error in
                     if let error = error {
                         continuation.resume(throwing: error)
                     } else {
