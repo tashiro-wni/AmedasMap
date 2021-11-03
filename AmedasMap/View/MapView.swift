@@ -83,6 +83,7 @@ struct MapView: UIViewRepresentable {
             LOG(#function + ", \(point.pointNameJa)")
         }
         
+        @MainActor
         func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
             guard let amedasView = view as? AmedasAnnotationView,
                   let point = amedasView.point else { return }

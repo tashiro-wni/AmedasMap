@@ -127,37 +127,36 @@ struct AmedasDataLoader {
     }()
     
     // 最新データの時刻を取得
-    func load(completion: @escaping (Result<AmedasMapReult, LoadError>) -> Void) {
-        guard let url = URL(string: API.amedasLatestTime) else {
-            completion(.failure(.wrongUrl))
-            return
-        }
-
-        LOG("load: " + url.absoluteString)
-        let task = URLSession.shared.dataTask(with: url) { (data, _, error) in
-            guard let data = data, error == nil else {
-                LOG("http error.")
-                completion(.failure(.httpError))
-                return
-            }
-            
-            let formatter = ISO8601DateFormatter()
-            formatter.timeZone = TimeZoneJST
-            
-            guard let text = String(data: data, encoding: .utf8),
-                  let date = formatter.date(from: text) else {
-                LOG("date parse error. \(String(data: data, encoding: .utf8) ?? "")")
-                completion(.failure(.parseError))
-                return
-            }
-            
-            LOG("parsed date: \(date)")
-            load(date: date, completion: completion)
-        }
-        task.resume()
-    }
+//    func load(completion: @escaping (Result<AmedasMapReult, LoadError>) -> Void) {
+//        guard let url = URL(string: API.amedasLatestTime) else {
+//            completion(.failure(.wrongUrl))
+//            return
+//        }
+//
+//        LOG("load: " + url.absoluteString)
+//        let task = URLSession.shared.dataTask(with: url) { (data, _, error) in
+//            guard let data = data, error == nil else {
+//                LOG("http error.")
+//                completion(.failure(.httpError))
+//                return
+//            }
+//
+//            let formatter = ISO8601DateFormatter()
+//            formatter.timeZone = TimeZoneJST
+//
+//            guard let text = String(data: data, encoding: .utf8),
+//                  let date = formatter.date(from: text) else {
+//                LOG("date parse error. \(String(data: data, encoding: .utf8) ?? "")")
+//                completion(.failure(.parseError))
+//                return
+//            }
+//
+//            LOG("parsed date: \(date)")
+//            load(date: date, completion: completion)
+//        }
+//        task.resume()
+//    }
   
-    @available(iOS 15.0, *)
     func load() async throws -> AmedasMapReult {
         guard let url = URL(string: API.amedasLatestTime) else {
             throw LoadError.wrongUrl
@@ -176,34 +175,33 @@ struct AmedasDataLoader {
     }
     
     // 指定時刻の観測値一覧を取得
-    private func load(date: Date, completion: @escaping (Result<AmedasMapReult, LoadError>) -> Void) {
-        dateFormatter.dateFormat = "yyyyMMddHHmm"
-        let urlString = String(format: API.amedasMapData, dateFormatter.string(from: date))
-        guard let url = URL(string: urlString) else {
-            completion(.failure(.wrongUrl))
-            return
-        }
-
-        LOG("load: " + urlString)
-        let task = URLSession.shared.dataTask(with: url) { (data, _, error) in
-            guard let data = data, error == nil else {
-                LOG("http error.")
-                completion(.failure(.httpError))
-                return
-            }
-            
-            guard let list = parseAmedasMapData(data: data, date: date) else {
-                LOG("json parse error.")
-                completion(.failure(.parseError))
-                return
-            }
-            
-            completion(.success(AmedasMapReult(date: date, data: list)))
-        }
-        task.resume()
-    }
+//    private func load(date: Date, completion: @escaping (Result<AmedasMapReult, LoadError>) -> Void) {
+//        dateFormatter.dateFormat = "yyyyMMddHHmm"
+//        let urlString = String(format: API.amedasMapData, dateFormatter.string(from: date))
+//        guard let url = URL(string: urlString) else {
+//            completion(.failure(.wrongUrl))
+//            return
+//        }
+//
+//        LOG("load: " + urlString)
+//        let task = URLSession.shared.dataTask(with: url) { (data, _, error) in
+//            guard let data = data, error == nil else {
+//                LOG("http error.")
+//                completion(.failure(.httpError))
+//                return
+//            }
+//
+//            guard let list = parseAmedasMapData(data: data, date: date) else {
+//                LOG("json parse error.")
+//                completion(.failure(.parseError))
+//                return
+//            }
+//
+//            completion(.success(AmedasMapReult(date: date, data: list)))
+//        }
+//        task.resume()
+//    }
     
-    @available(iOS 15.0, *)
     private func load(date: Date) async throws -> AmedasMapReult {
         dateFormatter.dateFormat = "yyyyMMddHHmm"
         let urlString = String(format: API.amedasMapData, dateFormatter.string(from: date))
@@ -240,76 +238,96 @@ struct AmedasDataLoader {
     }
 
     // 指定地点の時系列観測値(過去24時間分)を取得
-    func load(point: String, date: Date, completion: @escaping (Result<[AmedasData], LoadError>) -> Void) {
+//    func load(point: String, date: Date, completion: @escaping (Result<[AmedasData], LoadError>) -> Void) {
+//        let tm0 = floor(date.timeIntervalSince1970 / 10800) * 10800
+//        var allData: [AmedasData] = []
+//        var loading = 0
+//
+//        for i in 0...8 {
+//            let tm = tm0 - Double(10800 * i)
+//            loading += 1
+//            loadPointFile(point: point, date: Date(timeIntervalSince1970: tm)) { result in
+//                loading -= 1
+//                switch result {
+//                case .failure:
+//                    break
+//                case .success(let list):
+//                    allData.append(contentsOf: list)
+//                }
+//                if loading == 0 {
+//                    if allData.isEmpty {
+//                        completion(.failure(.parseError))
+//                    } else {
+//                        // 全ての読み込みが完了したら、時系列にsortして返す
+//                        completion(.success(allData.sorted(by: {$0.time < $1.time})))
+//                    }
+//                }
+//            }
+//        }
+//    }
+    
+    func load(point: String, date: Date) async throws -> [AmedasData] {
         let tm0 = floor(date.timeIntervalSince1970 / 10800) * 10800
         var allData: [AmedasData] = []
-        var loading = 0
-        
-        for i in 0...8 {
-            let tm = tm0 - Double(10800 * i)
-            loading += 1
-            loadPointFile(point: point, date: Date(timeIntervalSince1970: tm)) { result in
-                loading -= 1
-                switch result {
-                case .failure:
-                    break
-                case .success(let list):
-                    allData.append(contentsOf: list)
-                }
-                if loading == 0 {
-                    if allData.isEmpty {
-                        completion(.failure(.parseError))
-                    } else {
-                        // 全ての読み込みが完了したら、時系列にsortして返す
-                        completion(.success(allData.sorted(by: {$0.time < $1.time})))
-                    }
+
+        try await withThrowingTaskGroup(of: [AmedasData].self) { group in
+            for i in 0...8 {
+                let tm = tm0 - Double(10800 * i)
+                    
+                group.addTask {
+                    return try await loadPointFile(point: point, date: Date(timeIntervalSince1970: tm))
                 }
             }
+            // 子タスクから結果を完了した順に allData に追加
+            for try await list in group {
+                allData.append(contentsOf: list)
+            }
         }
+        // 全ての読み込みが完了したら、時系列にsortして返す
+        return allData.sorted(by: {$0.time < $1.time})
     }
     
     // 指定地点の時系列観測値(1ファイル、最大3時間分)を取得
-    private func loadPointFile(point: String, date: Date, completion: @escaping (Result<[AmedasData], LoadError>) -> Void) {
+//    private func loadPointFile(point: String, date: Date, completion: @escaping (Result<[AmedasData], LoadError>) -> Void) {
+//        dateFormatter.dateFormat = "yyyyMMdd_HH"
+//        let urlString = String(format: API.amedasPointData, point, dateFormatter.string(from: date))
+//        guard let url = URL(string: urlString) else {
+//            completion(.failure(.wrongUrl))
+//            return
+//        }
+//
+//        LOG("load: " + urlString)
+//        let task = URLSession.shared.dataTask(with: url) { (data, _, error) in
+//            guard let data = data, error == nil else {
+//                LOG("http error.")
+//                completion(.failure(.httpError))
+//                return
+//            }
+//
+//            guard let list = parseAmedasPointData(data: data, point: point) else {
+//                LOG("json parse error.")
+//                completion(.failure(.parseError))
+//                return
+//            }
+//
+//            completion(.success(list))
+//        }
+//        task.resume()
+//    }
+
+    private func loadPointFile(point: String, date: Date) async throws -> [AmedasData] {
         dateFormatter.dateFormat = "yyyyMMdd_HH"
         let urlString = String(format: API.amedasPointData, point, dateFormatter.string(from: date))
         guard let url = URL(string: urlString) else {
-            completion(.failure(.wrongUrl))
-            return
+            throw LoadError.wrongUrl
         }
-
         LOG("load: " + urlString)
-        let task = URLSession.shared.dataTask(with: url) { (data, _, error) in
-            guard let data = data, error == nil else {
-                LOG("http error.")
-                completion(.failure(.httpError))
-                return
-            }
-            
-            guard let list = parseAmedasPointData(data: data, point: point) else {
-                LOG("json parse error.")
-                completion(.failure(.parseError))
-                return
-            }
-            
-            completion(.success(list))
+        let (data, _) = try await URLSession.shared.data(for: URLRequest(url: url))
+        guard let list = parseAmedasPointData(data: data, point: point) else {
+            throw LoadError.parseError
         }
-        task.resume()
+        return list
     }
-
-//    @available(iOS 15.0, *)
-//    private func loadPointFile(point: String, date: Date) async throws -> [AmedasData] {
-//        dateFormatter.dateFormat = "yyyyMMddHHmm"
-//        let urlString = String(format: API.amedasMapData, dateFormatter.string(from: date))
-//        guard let url = URL(string: urlString) else {
-//            throw LoadError.wrongUrl
-//        }
-//        LOG("load: " + urlString)
-//        let (data, _) = try await URLSession.shared.data(for: URLRequest(url: url))
-//        guard let list = parseAmedasMapData(data: data, date: date) else {
-//            throw LoadError.parseError
-//        }
-//        return list
-//    }
 
     private func parseAmedasPointData(data: Data, point: String) -> [AmedasData]? {
         guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: [String: Any]] else {

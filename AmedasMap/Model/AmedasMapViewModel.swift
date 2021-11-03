@@ -44,104 +44,108 @@ final class AmedasMapViewModel: ObservableObject {
     
     // MARK: -
     init() {
-        if #available(iOS 15.0, *) {
-            Task() {
-                await self.loadPoints2()
-                await self.loadMapData2()
-            }
-        } else {
-            loadPoints()
-            loadMapData()
+        Task() {
+            await loadPoints2()
+            await loadMapData2()
+        }
+    }
+    
+    func reload() {
+        Task() {
+            await loadMapData2()
         }
     }
     
     // 地点リストを読み込み
-    private func loadPoints() {
-        hasError = false
-
-        AmedasTableLoader().load() { [weak self] result in
-            DispatchQueue.main.async { [weak self] in
-                switch result {
-                case .success(let points):
-                    LOG("update amedasPoints \(points.count) points.")
-                    self?.amedasPoints = points
-                    
-                case .failure:
-                    self?.hasError = true
-                }
-            }
-        }
-    }
+//    private func loadPoints() {
+//        hasError = false
+//
+//        AmedasTableLoader().load() { [weak self] result in
+//            DispatchQueue.main.async { [weak self] in
+//                switch result {
+//                case .success(let points):
+//                    LOG("update amedasPoints \(points.count) points.")
+//                    self?.amedasPoints = points
+//
+//                case .failure:
+//                    self?.hasError = true
+//                }
+//            }
+//        }
+//    }
     
-    @available(iOS 15.0, *)
-    func loadPoints2() async {
+    @MainActor
+    private func loadPoints2() async {
         LOG(#function)
         //hasError = false
         do {
             let points = try await AmedasTableLoader().load()
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                self.hasError = false
-                self.amedasPoints = points
-                LOG("update amedasPoints \(points.count) points.")
-            }
+            hasError = false
+            amedasPoints = points
+            LOG("update amedasPoints \(points.count) points.")
         } catch {
             hasError = true
         }
     }
 
     // 最新の観測データを読み込み
-    func loadMapData() {
-        LOG(#function)
-        hasError = false
-
-        loader.load() { [weak self] result in
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                switch result {
-                case .success(let data):
-                    self.amedasData = data.data
-                    self.date = data.date
-                    LOG("update amedasData \(self.dateText), \(data.data.count) points.")
-
-                case .failure:
-                    self.hasError = true
-                }
-            }
-        }
-    }
+//    func loadMapData() {
+//        LOG(#function)
+//        hasError = false
+//
+//        loader.load() { [weak self] result in
+//            DispatchQueue.main.async { [weak self] in
+//                guard let self = self else { return }
+//                switch result {
+//                case .success(let data):
+//                    self.amedasData = data.data
+//                    self.date = data.date
+//                    LOG("update amedasData \(self.dateText), \(data.data.count) points.")
+//
+//                case .failure:
+//                    self.hasError = true
+//                }
+//            }
+//        }
+//    }
     
-    @available(iOS 15.0, *)
-    func loadMapData2() async {
+    @MainActor
+    private func loadMapData2() async {
         LOG(#function)
         do {
             let data = try await loader.load()
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                self.hasError = false
-                self.amedasData = data.data
-                self.date = data.date
-                LOG("update amedasData \(self.dateText), \(data.data.count) points.")
-            }
+            hasError = false
+            amedasData = data.data
+            date = data.date
+            LOG("update amedasData \(dateText), \(data.data.count) points.")
         } catch {
             hasError = true
         }
     }
 
     // 指定地点の時系列データを読み込み
+    @MainActor
     func loadPointData(_ point: String) {
         LOG(#function + ", point:\(point)")
         guard let date = date else { return }
         selectedPoint = point
-        loader.load(point: point, date: date) { result in
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                switch result {
-                case .success(let data):
-                    self.selectedPointData = data                
-                case .failure:
-                    self.hasError = true
-                }
+//        loader.load(point: point, date: date) { result in
+//            DispatchQueue.main.async { [weak self] in
+//                guard let self = self else { return }
+//                switch result {
+//                case .success(let data):
+//                    self.selectedPointData = data
+//                case .failure:
+//                    self.hasError = true
+//                }
+//            }
+//        }
+        Task() {
+            do {
+                selectedPointData = try await loader.load(point: point, date: date)
+                hasError = false
+            } catch {
+                hasError = true
             }
         }
     }
