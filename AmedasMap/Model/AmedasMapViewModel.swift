@@ -45,14 +45,14 @@ final class AmedasMapViewModel: ObservableObject {
     // MARK: -
     init() {
         Task() {
-            await self.loadPoints2()
-            await self.loadMapData2()
+            await loadPoints2()
+            await loadMapData2()
         }
     }
     
     func reload() {
         Task() {
-            await self.loadMapData2()
+            await loadMapData2()
         }
     }
     
@@ -74,17 +74,15 @@ final class AmedasMapViewModel: ObservableObject {
 //        }
 //    }
     
+    @MainActor
     private func loadPoints2() async {
         LOG(#function)
         //hasError = false
         do {
             let points = try await AmedasTableLoader().load()
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                self.hasError = false
-                self.amedasPoints = points
-                LOG("update amedasPoints \(points.count) points.")
-            }
+            hasError = false
+            amedasPoints = points
+            LOG("update amedasPoints \(points.count) points.")
         } catch {
             hasError = true
         }
@@ -111,36 +109,43 @@ final class AmedasMapViewModel: ObservableObject {
 //        }
 //    }
     
+    @MainActor
     private func loadMapData2() async {
         LOG(#function)
         do {
             let data = try await loader.load()
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                self.hasError = false
-                self.amedasData = data.data
-                self.date = data.date
-                LOG("update amedasData \(self.dateText), \(data.data.count) points.")
-            }
+            hasError = false
+            amedasData = data.data
+            date = data.date
+            LOG("update amedasData \(dateText), \(data.data.count) points.")
         } catch {
             hasError = true
         }
     }
 
     // 指定地点の時系列データを読み込み
+    @MainActor
     func loadPointData(_ point: String) {
         LOG(#function + ", point:\(point)")
         guard let date = date else { return }
         selectedPoint = point
-        loader.load(point: point, date: date) { result in
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                switch result {
-                case .success(let data):
-                    self.selectedPointData = data                
-                case .failure:
-                    self.hasError = true
-                }
+//        loader.load(point: point, date: date) { result in
+//            DispatchQueue.main.async { [weak self] in
+//                guard let self = self else { return }
+//                switch result {
+//                case .success(let data):
+//                    self.selectedPointData = data
+//                case .failure:
+//                    self.hasError = true
+//                }
+//            }
+//        }
+        Task() {
+            do {
+                selectedPointData = try await loader.load(point: point, date: date)
+                hasError = false
+            } catch {
+                hasError = true
             }
         }
     }
