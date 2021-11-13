@@ -27,11 +27,14 @@ struct PointView: View {
         VStack(spacing: 0) {
             Text(pointName)
                 .font(.title)
-                .padding(16)
+                .padding(12)
             List(viewModel.selectedPointData.reversed().filter{ $0.is0min }.prefix(24), id: \.self) { item in
                 Text(formattedText(item))
                     .lineLimit(1)
+                
             }
+            .listStyle(.plain)
+            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
         }
     }
     
