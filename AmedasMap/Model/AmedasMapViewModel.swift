@@ -75,11 +75,11 @@ final class AmedasMapViewModel: ObservableObject {
     private func loadMapData() async {
         LOG(#function)
         do {
-            let data = try await AmedasDataLoader.load()
+            let result = try await AmedasDataLoader.load()
             hasError = false
-            amedasData = data.data
-            date = data.date
-            LOG("update amedasData \(dateText), \(data.data.count) points.")
+            amedasData = result.data
+            date = result.date
+            LOG("update amedasData \(dateText), \(result.data.count) points.")
         } catch {
             hasError = true
         }
