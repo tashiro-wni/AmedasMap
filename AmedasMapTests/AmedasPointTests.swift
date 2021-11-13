@@ -17,7 +17,7 @@ class AmedasPointTests: XCTestCase {
         }
         """.data(using: .utf8)!
         
-        let list = AmedasTableLoader().parseAmedasTable(data: testData)!
+        let list = AmedasTableLoader.parseAmedasTable(data: testData)!
         XCTAssertEqual(list.count, 2)
 
         XCTAssertEqual(list["11001"]!.pointID, "11001")

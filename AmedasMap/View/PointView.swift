@@ -28,6 +28,7 @@ struct PointView: View {
             Text(pointName)
                 .font(.title)
                 .padding(12)
+            // 選択地点のデータを時刻の新しい順に取り出し、正時(00分)のデータを24個取り出す
             List(viewModel.selectedPointData.reversed().filter{ $0.is0min }.prefix(24), id: \.self) { item in
                 Text(formattedText(item))
                     .lineLimit(1)
@@ -38,7 +39,7 @@ struct PointView: View {
         }
     }
     
-    func formattedText(_ item: AmedasData) -> String {
+    private func formattedText(_ item: AmedasData) -> String {
         var texts: [String] = []
         texts.append(dateFormatter.string(from: Date(timeIntervalSince1970: item.time)))
         if item.hasValidData(for: .temperature) {
