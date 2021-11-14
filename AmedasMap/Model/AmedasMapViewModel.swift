@@ -36,8 +36,8 @@ final class AmedasMapViewModel: ObservableObject {
     private let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy/M/d H:mm"
-        dateFormatter.locale = LocalePOSIX
-        dateFormatter.timeZone = TimeZoneJST
+        dateFormatter.locale = .posix
+        dateFormatter.timeZone = .jst
         return dateFormatter
     }()
     //private let loader = ()

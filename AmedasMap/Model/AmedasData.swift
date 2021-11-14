@@ -120,8 +120,8 @@ enum AmedasDataLoader {
     
     private static let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
-        dateFormatter.locale = LocalePOSIX
-        dateFormatter.timeZone = TimeZoneJST
+        dateFormatter.locale = .posix
+        dateFormatter.timeZone = .jst
         return dateFormatter
     }()
     
@@ -134,7 +134,7 @@ enum AmedasDataLoader {
         let (data, _) = try await URLSession.shared.data2(from: url)
         
         let formatter = ISO8601DateFormatter()
-        formatter.timeZone = TimeZoneJST
+        formatter.timeZone = .jst
         
         guard let text = String(data: data, encoding: .utf8),
               let date = formatter.date(from: text) else {
