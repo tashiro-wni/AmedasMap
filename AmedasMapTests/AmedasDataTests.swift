@@ -25,7 +25,7 @@ class AmedasDataTests: XCTestCase {
         }
         """.data(using: .utf8)!
         
-        let list = AmedasDataLoader().parseAmedasMapData(data: testData, date: Date())!
+        let list = AmedasDataLoader.parseAmedasMapData(data: testData, date: Date())!
             .sorted { $0.pointID < $1.pointID } .map { $0 }  // Array の順番は不定なので、pointID で sort してからテストする。
         XCTAssertEqual(list.count, 3)
 

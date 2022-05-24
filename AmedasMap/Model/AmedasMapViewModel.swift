@@ -36,33 +36,32 @@ final class AmedasMapViewModel: ObservableObject {
     private let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy/M/d H:mm"
-        dateFormatter.locale = LocalePOSIX
-        dateFormatter.timeZone = TimeZoneJST
+        dateFormatter.locale = .posix
+        dateFormatter.timeZone = .jst
         return dateFormatter
     }()
-    private let loader = AmedasDataLoader()
+    //private let loader = ()
     
     // MARK: -
     init() {
         Task() {
-            await loadPoints2()
-            await loadMapData2()
+            await loadPoints()
+            await loadMapData()
         }
     }
     
     func reload() {
         Task() {
-            await loadMapData2()
+            await loadMapData()
         }
     }
     
     // 地点リストを読み込み
     @MainActor
-    private func loadPoints2() async {
+    private func loadPoints() async {
         LOG(#function)
-        //hasError = false
         do {
-            let points = try await AmedasTableLoader().load()
+            let points = try await AmedasTableLoader.load()
             hasError = false
             amedasPoints = points
             LOG("update amedasPoints \(points.count) points.")
@@ -73,14 +72,14 @@ final class AmedasMapViewModel: ObservableObject {
 
     // 最新の観測データを読み込み
     @MainActor
-    private func loadMapData2() async {
+    private func loadMapData() async {
         LOG(#function)
         do {
-            let data = try await loader.load()
+            let result = try await AmedasDataLoader.load()
             hasError = false
-            amedasData = data.data
-            date = data.date
-            LOG("update amedasData \(dateText), \(data.data.count) points.")
+            amedasData = result.data
+            date = result.date
+            LOG("update amedasData \(dateText), \(result.data.count) points.")
         } catch {
             hasError = true
         }
@@ -95,7 +94,7 @@ final class AmedasMapViewModel: ObservableObject {
 
         Task() {
             do {
-                selectedPointData = try await loader.load(point: point, date: date)
+                selectedPointData = try await AmedasDataLoader.load(point: point, date: date)
                 hasError = false
             } catch {
                 hasError = true

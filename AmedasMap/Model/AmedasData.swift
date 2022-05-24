@@ -106,7 +106,7 @@ struct AmedasData: Hashable, CustomStringConvertible {
 }
 
 // MARK: - AmedasDataLoader
-struct AmedasDataLoader {
+enum AmedasDataLoader {
     struct AmedasMapReult {
         let date: Date
         let data: [AmedasData]
@@ -118,16 +118,15 @@ struct AmedasDataLoader {
         case parseError
     }
     
-    private let dateFormatter: DateFormatter = {
+    private static let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyyMMddHHmm"
-        dateFormatter.locale = LocalePOSIX
-        dateFormatter.timeZone = TimeZoneJST
+        dateFormatter.locale = .posix
+        dateFormatter.timeZone = .jst
         return dateFormatter
     }()
     
     // 最新データの時刻を取得
-    func load() async throws -> AmedasMapReult {
+    static func load() async throws -> AmedasMapReult {
         guard let url = URL(string: API.amedasLatestTime) else {
             throw LoadError.wrongUrl
         }
@@ -135,7 +134,7 @@ struct AmedasDataLoader {
         let (data, _) = try await URLSession.shared.data2(from: url)
         
         let formatter = ISO8601DateFormatter()
-        formatter.timeZone = TimeZoneJST
+        formatter.timeZone = .jst
         
         guard let text = String(data: data, encoding: .utf8),
               let date = formatter.date(from: text) else {
@@ -145,7 +144,7 @@ struct AmedasDataLoader {
     }
     
     // 指定時刻の観測値一覧を取得
-    private func load(date: Date) async throws -> AmedasMapReult {
+    private static func load(date: Date) async throws -> AmedasMapReult {
         dateFormatter.dateFormat = "yyyyMMddHHmm"
         let urlString = String(format: API.amedasMapData, dateFormatter.string(from: date))
         guard let url = URL(string: urlString) else {
@@ -159,7 +158,7 @@ struct AmedasDataLoader {
         return AmedasMapReult(date: date, data: list)
     }
 
-    func parseAmedasMapData(data: Data, date: Date) -> [AmedasData]? {
+    static func parseAmedasMapData(data: Data, date: Date) -> [AmedasData]? {
         guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: [String: Any]] else {
             return nil
         }
@@ -181,7 +180,7 @@ struct AmedasDataLoader {
     }
 
     // 指定地点の時系列観測値(過去24時間分)を取得
-    func load(point: String, date: Date) async throws -> [AmedasData] {
+    static func load(point: String, date: Date) async throws -> [AmedasData] {
         let tm0 = floor(date.timeIntervalSince1970 / 10800) * 10800
         var allData: [AmedasData] = []
 
@@ -204,7 +203,7 @@ struct AmedasDataLoader {
     }
     
     // 指定地点の時系列観測値(1ファイル、最大3時間分)を取得
-    private func loadPointFile(point: String, date: Date) async throws -> [AmedasData] {
+    private static func loadPointFile(point: String, date: Date) async throws -> [AmedasData] {
         dateFormatter.dateFormat = "yyyyMMdd_HH"
         let urlString = String(format: API.amedasPointData, point, dateFormatter.string(from: date))
         guard let url = URL(string: urlString) else {
@@ -218,7 +217,7 @@ struct AmedasDataLoader {
         return list
     }
 
-    private func parseAmedasPointData(data: Data, point: String) -> [AmedasData]? {
+    private static func parseAmedasPointData(data: Data, point: String) -> [AmedasData]? {
         guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: [String: Any]] else {
             return nil
         }
@@ -241,7 +240,7 @@ struct AmedasDataLoader {
         return list
     }
     
-    private func parseDouble(_ value: Any?) -> Double? {
+    private static func parseDouble(_ value: Any?) -> Double? {
         guard let val = value as? [Double], val.count == 2 else { return nil }
         if val[1] == 0 {
             return val[0]
@@ -250,7 +249,7 @@ struct AmedasDataLoader {
         }
     }
     
-    private func parseInt(_ value: Any?) -> Int? {
+    private static func parseInt(_ value: Any?) -> Int? {
         guard let val = value as? [Int], val.count == 2 else { return nil }
         if val[1] == 0 {
             return val[0]

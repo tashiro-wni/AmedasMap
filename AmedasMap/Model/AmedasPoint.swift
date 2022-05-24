@@ -21,14 +21,14 @@ struct AmedasPoint: CustomStringConvertible {
 }
 
 // MARK: - AmedasTableLoader
-struct AmedasTableLoader {
+enum AmedasTableLoader {
     enum LoadError: Error {
         case wrongUrl
         case httpError
         case parseError
     }
     
-    func load() async throws -> [String: AmedasPoint] {
+    static func load() async throws -> [String: AmedasPoint] {
         guard let url = URL(string: API.amedasPointTable) else {
             throw LoadError.wrongUrl
         }
@@ -42,7 +42,7 @@ struct AmedasTableLoader {
         return list
     }
 
-    func parseAmedasTable(data: Data) -> [String: AmedasPoint]? {
+    static func parseAmedasTable(data: Data) -> [String: AmedasPoint]? {
         guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: [String: Any]] else {
             return nil
         }
