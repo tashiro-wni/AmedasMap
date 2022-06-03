@@ -74,6 +74,13 @@ struct MapView: UIViewRepresentable {
                   let view = mapView.dequeueReusableAnnotationView(withIdentifier: reuseIdentifier, for: annotation) as? AmedasAnnotationView else { return nil }
             
             view.point = amedas.point
+
+            view.rightCalloutAccessoryView = {
+                let button = UIButton(type: .detailDisclosure)
+                button.setImage(UIImage(systemName: "chevron.forward"), for: .normal)
+                return button
+            }()
+
             return view
         }
         
