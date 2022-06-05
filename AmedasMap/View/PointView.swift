@@ -71,6 +71,10 @@ struct Colmun: View {
                 Text(item.text(for: .humidity))
                     .frame(width: 50, alignment: .trailing)
             }
+            if width > 500, item.hasValidData(for: .pressure) {
+                Text(item.text(for: .pressure))
+                    .frame(width: 90, alignment: .trailing)
+            }
         }
     }
 }

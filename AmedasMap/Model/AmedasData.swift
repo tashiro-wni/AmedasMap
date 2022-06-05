@@ -8,7 +8,7 @@
 import Foundation
 
 enum AmedasElement: CaseIterable {
-    case temperature, precipitation, wind, sun, humidity
+    case temperature, precipitation, wind, sun, humidity, pressure
 }
 
 // MARK: - AmedasData
@@ -23,6 +23,7 @@ struct AmedasData: Hashable, CustomStringConvertible {
     let windSpeed: Double?
     let sun1h: Double?
     let humidity: Double?
+    let pressure: Double?
 
     var is0min: Bool {  // 00分
         Int(time).isMultiple(of: 3600)
@@ -47,6 +48,8 @@ struct AmedasData: Hashable, CustomStringConvertible {
             return sun1h != nil
         case .humidity:
             return humidity != nil
+        case .pressure:
+            return pressure != nil
         }
     }
 
@@ -62,6 +65,8 @@ struct AmedasData: Hashable, CustomStringConvertible {
             return sunText
         case .humidity:
             return humidityText
+        case .pressure:
+            return pressureText
         }
     }
     
@@ -90,6 +95,11 @@ struct AmedasData: Hashable, CustomStringConvertible {
         guard let humidity = humidity else { return invalidText }
         return String(format: "%.0f%%", humidity)
     }
+    
+    private var pressureText: String {
+        guard let pressure = pressure else { return invalidText }
+        return String(format: "%.1fhPa", pressure)
+    }
 
     var description: String {
         var ary: [String] = []
@@ -100,6 +110,7 @@ struct AmedasData: Hashable, CustomStringConvertible {
         ary.append("wind:" + windText)
         ary.append("sun:" + sunText)
         ary.append("hum:" + humidityText)
+        ary.append("pres:" + pressureText)
 
         return ary.joined(separator: ", ")
     }
@@ -173,7 +184,8 @@ enum AmedasDataLoader {
                                  windDirection:    parseInt(item.value["windDirection"]),
                                  windSpeed:        parseDouble(item.value["wind"]),
                                  sun1h:            parseDouble(item.value["sun1h"]),
-                                 humidity:         parseDouble(item.value["humidity"]))
+                                 humidity:         parseDouble(item.value["humidity"]),
+                                 pressure:         parseDouble(item.value["pressure"]))
             list.append(obs)
         }
         return list
@@ -234,7 +246,9 @@ enum AmedasDataLoader {
                                  windDirection:    parseInt(item.value["windDirection"]),
                                  windSpeed:        parseDouble(item.value["wind"]),
                                  sun1h:            parseDouble(item.value["sun1h"]),
-                                 humidity:         parseDouble(item.value["humidity"]))
+                                 humidity:         parseDouble(item.value["humidity"]),
+                                 pressure:         parseDouble(item.value["pressure"])
+            )
             list.append(obs)
         }
         return list
