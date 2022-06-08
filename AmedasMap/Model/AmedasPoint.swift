@@ -33,7 +33,7 @@ enum AmedasTableLoader {
             throw LoadError.wrongUrl
         }
         LOG("load: " + url.absoluteString)
-        let (data, _) = try await URLSession.shared.data2(from: url)
+        let (data, _) = try await URLSession.shared.data(from: url)
         
         guard let list = parseAmedasTable(data: data) else {
             LOG("json parse error.")

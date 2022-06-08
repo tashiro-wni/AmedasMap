@@ -142,7 +142,7 @@ enum AmedasDataLoader {
             throw LoadError.wrongUrl
         }
         LOG("load: " + url.absoluteString)
-        let (data, _) = try await URLSession.shared.data2(from: url)
+        let (data, _) = try await URLSession.shared.data(from: url)
         
         let formatter = ISO8601DateFormatter()
         formatter.timeZone = .jst
@@ -162,7 +162,7 @@ enum AmedasDataLoader {
             throw LoadError.wrongUrl
         }
         LOG("load: " + urlString)
-        let (data, _) = try await URLSession.shared.data2(from: url)
+        let (data, _) = try await URLSession.shared.data(from: url)
         guard let list = parseAmedasMapData(data: data, date: date) else {
             throw LoadError.parseError
         }
@@ -222,7 +222,7 @@ enum AmedasDataLoader {
             throw LoadError.wrongUrl
         }
         LOG("load: " + urlString)
-        let (data, _) = try await URLSession.shared.data2(from: url)
+        let (data, _) = try await URLSession.shared.data(from: url)
         guard let list = parseAmedasPointData(data: data, point: point) else {
             throw LoadError.parseError
         }
