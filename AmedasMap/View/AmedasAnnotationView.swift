@@ -15,7 +15,7 @@ private extension AmedasElement {
     
     var iconShape: Shape {
         switch self {
-        case .temperature, .precipitation, .sun, .humidity:
+        case .temperature, .precipitation, .sun, .humidity, .pressure:
             return .circle
         case .wind:
             return .arrow
@@ -33,7 +33,8 @@ extension AmedasData {
                           "#00F42E", "#FAF714", "#FF6666", "#E00000", ],
         .wind:          [ "#999999", "#002CB2", "#5FB235", "#FFBF00", "#FF7F00", "#D90000" ],
         .sun:           [ "#999999", "#FFFF00", "#FFA500" ],
-        .humidity:      [ "#999999", "#45A3E5", "#002CB2" ] ]
+        .humidity:      [ "#999999", "#45A3E5", "#002CB2" ],
+        .pressure:      [ "#999999" ]]
 
     static var allIdentifiers: [String] {
         var list: [String] = []
@@ -132,6 +133,10 @@ extension AmedasData {
             default:  return nil
             }
             ary = [ element.iconShape.rawValue, colors[colorIndex] ]
+            
+        case .pressure:
+            guard pressure != nil else { return nil }
+            ary = [ element.iconShape.rawValue, colors[0] ]
         }
         
         return ary.joined(separator: ",")

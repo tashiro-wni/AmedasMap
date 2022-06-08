@@ -15,6 +15,7 @@ private extension AmedasElement {
         case .wind:           return Image(systemName: "wind")
         case .sun:            return Image(systemName: "sun.max")
         case .humidity:       return Image(systemName: "drop")
+        case .pressure:       return Image(systemName: "timer.square")
         }
     }
 }
