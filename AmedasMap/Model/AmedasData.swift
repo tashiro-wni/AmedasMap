@@ -12,7 +12,7 @@ enum AmedasElement: CaseIterable {
 }
 
 // MARK: - AmedasData
-struct AmedasData: Hashable, CustomStringConvertible {
+struct AmedasData: Hashable, Identifiable, CustomStringConvertible {
     let id = UUID()
     let pointID: String
     let time: TimeInterval
