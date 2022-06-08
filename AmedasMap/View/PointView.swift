@@ -34,36 +34,38 @@ struct PointView: View {
                     .font(.title)
                     .padding(12)
 
-                // 表で表示する
-                Grid(alignment: .trailing) {
-                    // 選択地点のデータを時刻の新しい順に取り出し、正時(00分)のデータを24個取り出す
-                    ForEach(viewModel.selectedPointData.reversed().filter{ $0.is0min }.prefix(24), id: \.self) { item in
-                        GridRow() {
-                            Text(dateFormatter.string(from: Date(timeIntervalSince1970: item.time)))
-
-                            if item.hasValidData(for: .temperature) {
-                                Text(item.text(for: .temperature))
+                ScrollView(.vertical) {
+                    // 表で表示する
+                    Grid(alignment: .trailing) {
+                        // 選択地点のデータを時刻の新しい順に取り出し、正時(00分)のデータを24個取り出す
+                        ForEach(viewModel.selectedPointData.reversed().filter{ $0.is0min }.prefix(24), id: \.self) { item in
+                            GridRow() {
+                                Text(dateFormatter.string(from: Date(timeIntervalSince1970: item.time)))
+                                
+                                if item.hasValidData(for: .temperature) {
+                                    Text(item.text(for: .temperature))
+                                }
+                                if item.text(for: .precipitation) != item.invalidText {
+                                    Text(item.text(for: .precipitation))
+                                }
+                                if item.hasValidData(for: .wind) {
+                                    Text(item.text(for: .wind))
+                                }
+                                if isLandscape(geometry), item.hasValidData(for: .sun) {
+                                    Text(item.text(for: .sun))
+                                }
+                                if isLandscape(geometry), item.hasValidData(for: .humidity) {
+                                    Text(item.text(for: .humidity))
+                                }
+                                if isLandscape(geometry), item.hasValidData(for: .pressure) {
+                                    Text(item.text(for: .pressure))
+                                }
+                                Spacer()
                             }
-                            if item.text(for: .precipitation) != item.invalidText {
-                                Text(item.text(for: .precipitation))
-                            }
-                            if item.hasValidData(for: .wind) {
-                                Text(item.text(for: .wind))
-                            }
-                            if isLandscape(geometry), item.hasValidData(for: .sun) {
-                                Text(item.text(for: .sun))
-                            }
-                            if isLandscape(geometry), item.hasValidData(for: .humidity) {
-                                Text(item.text(for: .humidity))
-                            }
-                            if isLandscape(geometry), item.hasValidData(for: .pressure) {
-                                Text(item.text(for: .pressure))
-                            }
-                            Spacer()
+                            .lineLimit(1)
+                            
+                            Divider()
                         }
-                        .lineLimit(1)
-
-                        Divider()
                     }
                 }
             }
