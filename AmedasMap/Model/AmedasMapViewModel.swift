@@ -32,6 +32,7 @@ final class AmedasMapViewModel: ObservableObject {
             showModal = true
         }
     }
+    private(set) var selectedPointElements: [AmedasElement] = []
     
     private let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
@@ -40,7 +41,6 @@ final class AmedasMapViewModel: ObservableObject {
         dateFormatter.timeZone = .jst
         return dateFormatter
     }()
-    //private let loader = ()
     
     // MARK: -
     init() {
@@ -95,10 +95,24 @@ final class AmedasMapViewModel: ObservableObject {
         Task() {
             do {
                 selectedPointData = try await AmedasDataLoader.load(point: point, date: date)
+                updateSelectedPointElements()
                 hasError = false
             } catch {
                 hasError = true
             }
         }
+    }
+    
+    // 選択された地点で有効な要素を選び出す
+    private func updateSelectedPointElements() {
+        var elements: [AmedasElement] = []
+        
+        guard let item = selectedPointData.reversed().filter({ $0.is0min }).first else { return }
+        for element in AmedasElement.allCases {
+            if item.text(for: element) != item.invalidText {
+                elements.append(element)
+            }
+        }
+        selectedPointElements = elements
     }
 }
