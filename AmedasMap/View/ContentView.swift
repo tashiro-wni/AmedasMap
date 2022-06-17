@@ -14,7 +14,7 @@ private extension AmedasElement {
         case .precipitation:  return Image(systemName: "cloud.rain")
         case .wind:           return Image(systemName: "wind")
         case .sun:            return Image(systemName: "sun.max")
-        case .humidity:       return Image(systemName: "drop")
+        case .humidity:       return Image(systemName: "humidity")
         case .pressure:       return Image(systemName: "timer.square")
         }
     }

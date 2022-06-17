@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Charts
 
 private extension AmedasElement {
     var title: String {
@@ -50,7 +51,25 @@ struct PointView: View {
                     .padding(12)
 
                 ScrollView(.vertical) {
-                    // 表で表示する
+                    // 気温グラフ
+                    if viewModel.selectedPointElements.contains(.temperature) {
+                        Text("気温").bold()
+                        Chart {
+                            ForEach(viewModel.selectedPointData.suffix(24 * 6), id: \.self) { item in
+                                LineMark(
+                                    x: .value("時刻", dateFormatter.string(from: Date(timeIntervalSince1970: item.time))),
+                                    y: .value("気温", item.temperature ?? 0)
+                                )
+                                .foregroundStyle(.red)
+                            }
+                        }
+                        .chartYScale(domain: viewModel.selectedPointData.compactMap({ $0.value(for: .temperature) }))  // Y軸の描画範囲を指定
+                        .frame(width: geometry.size.width - 40, height: 150)
+
+                        Divider()
+                    }
+
+                    // 表
                     Grid(alignment: .trailing) {
                         // 要素名
                         GridRow() {
@@ -62,6 +81,7 @@ struct PointView: View {
                             Spacer()
                         }
                         .lineLimit(1)
+                        .bold()
                         Divider()
                         
                         // 選択地点のデータを時刻の新しい順に取り出し、正時(00分)のデータを24個取り出す

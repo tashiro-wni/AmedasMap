@@ -53,6 +53,23 @@ struct AmedasData: Hashable, Identifiable, CustomStringConvertible {
         }
     }
 
+    func value(for element: AmedasElement) -> Double? {
+        switch element {
+        case .temperature:
+            return temperature
+        case .precipitation:
+            return precipitation1h
+        case .wind:
+            return windSpeed
+        case .sun:
+            return sun1h
+        case .humidity:
+            return humidity
+        case .pressure:
+            return pressure
+        }
+    }
+
     func text(for element: AmedasElement) -> String {
         switch element {
         case .temperature:
