@@ -19,6 +19,32 @@ private extension AmedasElement {
         case .pressure:       return "気圧"
         }
     }
+    
+    enum ChartType {
+        case line, bar
+    }
+    
+    var chartType: ChartType {
+        switch self {
+        case .temperature:    return .line
+        case .precipitation:  return .bar
+        case .wind:           return .line
+        case .sun:            return .bar
+        case .humidity:       return .line
+        case .pressure:       return .line
+        }
+    }
+    
+    var chartColor: Color {
+        switch self {
+        case .temperature:    return .red
+        case .precipitation:  return .blue
+        case .wind:           return .green
+        case .sun:            return .orange
+        case .humidity:       return .cyan
+        case .pressure:       return .green
+        }
+    }
 }
 
 struct PointView: View {
@@ -52,21 +78,14 @@ struct PointView: View {
 
                 ScrollView(.vertical) {
                     // 気温グラフ
-                    if viewModel.selectedPointElements.contains(.temperature) {
-                        Text("気温").bold()
-                        Chart {
-                            ForEach(viewModel.selectedPointData.suffix(24 * 6), id: \.self) { item in
-                                LineMark(
-                                    x: .value("時刻", dateFormatter.string(from: Date(timeIntervalSince1970: item.time))),
-                                    y: .value("気温", item.temperature ?? 0)
-                                )
-                                .foregroundStyle(.red)
-                            }
+                    ForEach(viewModel.selectedPointElements, id: \.self) { element in
+                        if viewModel.selectedPointElements.contains(element) {
+                            Text(element.title)
+                                .bold()
+                            AmedasChartView(data: viewModel.selectedPointData, element: element)
+                                .frame(width: geometry.size.width - 40, height: 150)
+                            Divider()
                         }
-                        .chartYScale(domain: viewModel.selectedPointData.compactMap({ $0.value(for: .temperature) }))  // Y軸の描画範囲を指定
-                        .frame(width: geometry.size.width - 40, height: 150)
-
-                        Divider()
                     }
 
                     // 表
@@ -101,6 +120,48 @@ struct PointView: View {
                     }
                 }
             }
+        }
+    }
+}
+
+// MARK: - AmedasChartView 要素ごとのグラフ
+struct AmedasChartView: View {
+    let data: [AmedasData]
+    let element: AmedasElement
+    
+    private let dateFormatter: DateFormatter = {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "H:mm"
+        dateFormatter.locale = .posix
+        dateFormatter.timeZone = .jst
+        return dateFormatter
+    }()
+
+    var body: some View {
+        if let min = data.compactMap({ $0.value(for: element) }).min(),
+           let max = data.compactMap({ $0.value(for: element) }).max() {
+            Chart {
+                ForEach(data.suffix(24 * 6), id: \.self) { item in
+                    if let value = item.value(for: element) {
+                        if element.chartType == .bar {
+                            BarMark(
+                                x: .value("時刻", dateFormatter.string(from: Date(timeIntervalSince1970: item.time))),
+                                y: .value(element.title, value)
+                            )
+                            .foregroundStyle(element.chartColor)
+                        } else {
+                            LineMark(
+                                x: .value("時刻", dateFormatter.string(from: Date(timeIntervalSince1970: item.time))),
+                                y: .value(element.title, value)
+                            )
+                            .foregroundStyle(element.chartColor)
+                        }
+                    }
+                }
+            }
+            .chartYScale(domain: min ... max)  // Y軸の描画範囲を指定
+        } else {
+            EmptyView()
         }
     }
 }
