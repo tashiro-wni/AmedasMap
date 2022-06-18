@@ -15,7 +15,7 @@ enum AmedasElement: CaseIterable {
 struct AmedasData: Hashable, Identifiable, CustomStringConvertible {
     let id = UUID()
     let pointID: String
-    let time: TimeInterval
+    let date: Date
     let temperature: Double?
     let precipitation1h: Double?
     let precipitation10m: Double?
@@ -26,7 +26,7 @@ struct AmedasData: Hashable, Identifiable, CustomStringConvertible {
     let pressure: Double?
 
     var is0min: Bool {  // 00分
-        Int(time).isMultiple(of: 3600)
+        Int(date.timeIntervalSince1970).isMultiple(of: 3600)
     }
     let invalidText = "-"
     private let directionText = [ "静穏", "北北東", "北東", "東北東", "東",
@@ -121,7 +121,7 @@ struct AmedasData: Hashable, Identifiable, CustomStringConvertible {
     var description: String {
         var ary: [String] = []
         ary.append(pointID)
-        ary.append("time:\(time)")
+        ary.append("time:\(date.timeIntervalSince1970)")
         ary.append("temp:" + temperatureText)
         ary.append("prec:" + precipitationText)
         ary.append("wind:" + windText)
@@ -194,7 +194,7 @@ enum AmedasDataLoader {
         var list: [AmedasData] = []
         for item in json {
             let obs = AmedasData(pointID:          item.key,
-                                 time:             date.timeIntervalSince1970,
+                                 date:             date,
                                  temperature:      parseDouble(item.value["temp"]),
                                  precipitation1h:  parseDouble(item.value["precipitation1h"]),
                                  precipitation10m: parseDouble(item.value["precipitation10m"]),
@@ -228,7 +228,7 @@ enum AmedasDataLoader {
             }
         }
         // 全ての読み込みが完了したら、時系列にsortして返す
-        return allData.sorted(by: {$0.time < $1.time})
+        return allData.sorted(by: {$0.date < $1.date})
     }
     
     // 指定地点の時系列観測値(1ファイル、最大3時間分)を取得
@@ -256,7 +256,7 @@ enum AmedasDataLoader {
         for item in json {
             guard let date = dateFormatter.date(from: item.key) else { continue }
             let obs = AmedasData(pointID:          point,
-                                 time:             date.timeIntervalSince1970,
+                                 date:             date,
                                  temperature:      parseDouble(item.value["temp"]),
                                  precipitation1h:  parseDouble(item.value["precipitation1h"]),
                                  precipitation10m: parseDouble(item.value["precipitation10m"]),

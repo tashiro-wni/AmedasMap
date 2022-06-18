@@ -13,7 +13,7 @@ private extension AmedasElement {
         switch self {
         case .temperature:    return "気温"
         case .precipitation:  return "降水量"
-        case .wind:           return "風向風速"
+        case .wind:           return "風速"
         case .sun:            return "日照"
         case .humidity:       return "湿度"
         case .pressure:       return "気圧"
@@ -82,7 +82,7 @@ struct PointView: View {
                         if viewModel.selectedPointElements.contains(element) {
                             Text(element.title)
                                 .bold()
-                            AmedasChartView(data: viewModel.selectedPointData, element: element)
+                            AmedasChartView(data: viewModel.selectedPointData.suffix(24 * 6), element: element)
                                 .frame(width: geometry.size.width - 40, height: 150)
                             Divider()
                         }
@@ -107,7 +107,7 @@ struct PointView: View {
                         ForEach(viewModel.selectedPointData.reversed().filter{ $0.is0min }.prefix(24), id: \.self) { item in
                             // 各時刻の観測値
                             GridRow() {
-                                Text(dateFormatter.string(from: Date(timeIntervalSince1970: item.time)))
+                                Text(dateFormatter.string(from: item.date))
                                 
                                 ForEach(displayElements(geometry), id: \.self) { element in
                                     Text(item.text(for: element))
@@ -129,37 +129,41 @@ struct AmedasChartView: View {
     let data: [AmedasData]
     let element: AmedasElement
     
-    private let dateFormatter: DateFormatter = {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "H:mm"
-        dateFormatter.locale = .posix
-        dateFormatter.timeZone = .jst
-        return dateFormatter
-    }()
-
     var body: some View {
         if let min = data.compactMap({ $0.value(for: element) }).min(),
            let max = data.compactMap({ $0.value(for: element) }).max() {
-            Chart {
-                ForEach(data.suffix(24 * 6), id: \.self) { item in
-                    if let value = item.value(for: element) {
-                        if element.chartType == .bar {
-                            BarMark(
-                                x: .value("時刻", dateFormatter.string(from: Date(timeIntervalSince1970: item.time))),
-                                y: .value(element.title, value)
-                            )
-                            .foregroundStyle(element.chartColor)
-                        } else {
-                            LineMark(
-                                x: .value("時刻", dateFormatter.string(from: Date(timeIntervalSince1970: item.time))),
-                                y: .value(element.title, value)
-                            )
-                            .foregroundStyle(element.chartColor)
-                        }
+            Chart(data, id: \.self) { item in
+                if let value = item.value(for: element) {
+                    if element.chartType == .bar {
+                        BarMark(
+                            x: .value("時刻", item.date, unit: .minute),
+                            y: .value(element.title, value),
+                            width: 2
+                        )
+                        .foregroundStyle(element.chartColor)
+                    } else {
+                        LineMark(
+                            x: .value("時刻", item.date, unit: .minute),
+                            y: .value(element.title, value)
+                        )
+                        .foregroundStyle(element.chartColor)
                     }
                 }
             }
             .chartYScale(domain: min ... max)  // Y軸の描画範囲を指定
+            .chartXAxis {  // X軸の表記を定義
+                AxisMarks(values: .stride(by: .hour)) { value in
+                    AxisGridLine()
+                    // 3時間ごとにX軸に時刻を表示
+                    if Int(value.as(Date.self)!.timeIntervalSince1970).isMultiple(of: 3600 * 3) {
+                        AxisTick()
+                        // see Date.FormatStyle
+                        // https://developer.apple.com/documentation/foundation/date/formatstyle
+                        // DateFormatter "H" 相当、必要なら .locale() を追加
+                        AxisValueLabel(format: .dateTime.hour(.defaultDigits(amPM: .omitted)))
+                    }
+                }
+            }
         } else {
             EmptyView()
         }
