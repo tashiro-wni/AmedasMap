@@ -228,7 +228,7 @@ enum AmedasDataLoader {
             }
         }
         // 全ての読み込みが完了したら、時系列にsortして返す
-        return allData.sorted(by: {$0.date < $1.date})
+        return allData.sorted(by: {$0.date < $1.date}).suffix(24 * 6)
     }
     
     // 指定地点の時系列観測値(1ファイル、最大3時間分)を取得

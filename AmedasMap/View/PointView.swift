@@ -82,7 +82,7 @@ struct PointView: View {
                         if viewModel.selectedPointElements.contains(element) {
                             Text(element.title)
                                 .bold()
-                            AmedasChartView(data: viewModel.selectedPointData.suffix(24 * 6), element: element)
+                            AmedasChartView(data: viewModel.selectedPointData, element: element)
                                 .frame(width: geometry.size.width - 40, height: 150)
                             Divider()
                         }
@@ -104,7 +104,7 @@ struct PointView: View {
                         Divider()
                         
                         // 選択地点のデータを時刻の新しい順に取り出し、正時(00分)のデータを24個取り出す
-                        ForEach(viewModel.selectedPointData.reversed().filter{ $0.is0min }.prefix(24), id: \.self) { item in
+                        ForEach(viewModel.selectedPointData.reversed().filter{ $0.is0min }, id: \.self) { item in
                             // 各時刻の観測値
                             GridRow() {
                                 Text(dateFormatter.string(from: item.date))
@@ -121,6 +121,12 @@ struct PointView: View {
                 }
             }
         }
+    }
+}
+
+private extension Date {
+    var showAxisLabel: Bool {
+        Int(timeIntervalSince1970).isMultiple(of: 3600 * 3)
     }
 }
 
@@ -155,7 +161,7 @@ struct AmedasChartView: View {
                 AxisMarks(values: .stride(by: .hour)) { value in
                     AxisGridLine()
                     // 3時間ごとにX軸に時刻を表示
-                    if Int(value.as(Date.self)!.timeIntervalSince1970).isMultiple(of: 3600 * 3) {
+                    if value.as(Date.self)!.showAxisLabel {
                         AxisTick()
                         // see Date.FormatStyle
                         // https://developer.apple.com/documentation/foundation/date/formatstyle
