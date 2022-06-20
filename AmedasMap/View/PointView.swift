@@ -45,6 +45,17 @@ private extension AmedasElement {
         case .pressure:       return .green
         }
     }
+
+    var chartRange: (min: Double?, max: Double?) {
+        switch self {
+        case .temperature:    return (min: nil, max: nil)
+        case .precipitation:  return (min: 0.0, max: 4.0)
+        case .wind:           return (min: 0.0, max: nil)
+        case .sun:            return (min: 0.0, max: 1.0)
+        case .humidity:       return (min: 0.0, max: 100.0)
+        case .pressure:       return (min: nil, max: nil)
+        }
+    }
 }
 
 struct PointView: View {
@@ -124,20 +135,24 @@ struct PointView: View {
     }
 }
 
-private extension Date {
-    var showAxisLabel: Bool {
-        Int(timeIntervalSince1970).isMultiple(of: 3600 * 3)
-    }
-}
-
 // MARK: - AmedasChartView 要素ごとのグラフ
 struct AmedasChartView: View {
     let data: [AmedasData]
     let element: AmedasElement
-    
+
+    func makeRange() -> (Double?, Double?) {
+        guard let min = data.compactMap({ $0.value(for: element) }).min(),
+              let max = data.compactMap({ $0.value(for: element) }).max() else {
+            return (nil, nil)
+        }
+
+        return ( [ min, element.chartRange.min ].compactMap({ $0 }).min(),
+                 [ max, element.chartRange.max ].compactMap({ $0 }).max() )
+    }
+
     var body: some View {
-        if let min = data.compactMap({ $0.value(for: element) }).min(),
-           let max = data.compactMap({ $0.value(for: element) }).max() {
+        let (min, max) = makeRange()
+        if let min = min, let max = max {
             Chart(data, id: \.self) { item in
                 if let value = item.value(for: element) {
                     if element.chartType == .bar {
@@ -173,5 +188,12 @@ struct AmedasChartView: View {
         } else {
             EmptyView()
         }
+    }
+}
+
+private extension Date {
+    // グラフのX軸にラベルを表示するか？
+    var showAxisLabel: Bool {
+        Int(timeIntervalSince1970).isMultiple(of: 3600 * 3)
     }
 }
