@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-private extension AmedasElement {
+extension AmedasElement {
     var image: Image {
         switch self {
         case .temperature:    return Image(systemName: "thermometer")
@@ -15,7 +15,7 @@ private extension AmedasElement {
         case .wind:           return Image(systemName: "wind")
         case .sun:            return Image(systemName: "sun.max")
         case .humidity:       return Image(systemName: "humidity")
-        case .pressure:       return Image(systemName: "timer.square")
+        case .pressure:       return Image(systemName: "rectangle.compress.vertical")
         }
     }
 }
@@ -94,7 +94,7 @@ struct ContentView: View {
             }
         }
         .sheet(isPresented: $viewModel.showModal) {
-            PointView(viewModel: viewModel)
+            PointView(viewModel: viewModel, selectedElement: viewModel.displayElement)
         }
         .alert(isPresented: $viewModel.hasError) {
             // エラー時にはAlertを表示する

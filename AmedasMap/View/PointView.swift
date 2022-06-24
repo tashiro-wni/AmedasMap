@@ -60,6 +60,7 @@ private extension AmedasElement {
 
 struct PointView: View {
     @StateObject var viewModel: AmedasMapViewModel
+    @State var selectedElement: AmedasElement
 
     private var pointName: String {
         String(format: "%@(%@)",
@@ -88,16 +89,23 @@ struct PointView: View {
                     .padding(12)
 
                 ScrollView(.vertical) {
-                    // 気温グラフ
-                    ForEach(viewModel.selectedPointElements, id: \.self) { element in
-                        if viewModel.selectedPointElements.contains(element) {
-                            Text(element.title)
-                                .bold()
-                            AmedasChartView(data: viewModel.selectedPointData, element: element)
-                                .frame(width: geometry.size.width - 40, height: 150)
-                            Divider()
+                    // グラフ
+                    Text(selectedElement.title)
+                        .bold()
+                    AmedasChartView(data: viewModel.selectedPointData, element: selectedElement)
+                        .frame(width: geometry.size.width - 40, height: 150)
+
+                    // グラフ要素を選択
+                    if viewModel.selectedPointElements.count > 1 {
+                        Picker(selection: $selectedElement, label: EmptyView()) {
+                            ForEach(viewModel.selectedPointElements, id: \.self) { element in
+                                element.image
+                            }
                         }
+                        .pickerStyle(SegmentedPickerStyle())
+                        .frame(width: 250)
                     }
+                    Divider()
 
                     // 表
                     Grid(alignment: .trailing) {
