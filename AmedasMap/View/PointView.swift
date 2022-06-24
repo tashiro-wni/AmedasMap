@@ -92,7 +92,7 @@ struct PointView: View {
                     // グラフ
                     Text(selectedElement.title)
                         .bold()
-                    AmedasChartView(data: viewModel.selectedPointData, element: selectedElement)
+                    AmedasChartView(data: viewModel.selectedPointData, element: selectedElement, selectedItem: nil)
                         .frame(width: geometry.size.width - 40, height: 150)
 
                     // グラフ要素を選択
@@ -147,7 +147,10 @@ struct PointView: View {
 struct AmedasChartView: View {
     let data: [AmedasData]
     let element: AmedasElement
+    //@Binding var selectedItem: (date: Date, text: String)?
+    @State var selectedItem: (date: Date, text: String)?
 
+    // グラフのY軸描画範囲を決定
     func makeRange() -> (Double?, Double?) {
         guard let min = data.compactMap({ $0.value(for: element) }).min(),
               let max = data.compactMap({ $0.value(for: element) }).max() else {
@@ -156,6 +159,28 @@ struct AmedasChartView: View {
 
         return ( [ min, element.chartRange.min ].compactMap({ $0 }).min(),
                  [ max, element.chartRange.max ].compactMap({ $0 }).max() )
+    }
+
+    // 触れている箇所の座標から値を取得
+    func findItem(location: CGPoint, proxy: ChartProxy, geometry: GeometryProxy) -> (date: Date, text: String)? {
+        let relativeXPosition = location.x - geometry[proxy.plotAreaFrame].origin.x
+        guard let date = proxy.value(atX: relativeXPosition) as Date? else { return nil }
+
+        // Find the closest date element.
+        var minDistance: TimeInterval = .infinity
+        var index: Int? = nil
+        for i in data.indices {
+            let distance = data[i].date.distance(to: date)
+            if abs(distance) < minDistance {
+                minDistance = abs(distance)
+                index = i
+            }
+        }
+        if let index = index {
+            return (date: data[index].date, text: data[index].text(for: element))
+        } else {
+            return nil
+        }
     }
 
     var body: some View {
@@ -191,6 +216,29 @@ struct AmedasChartView: View {
                         // DateFormatter "H" 相当、必要なら .locale() を追加
                         AxisValueLabel(format: .dateTime.hour(.defaultDigits(amPM: .omitted)))
                     }
+                }
+            }
+            .chartOverlay { proxy in
+                GeometryReader { nthGeometryItem in
+                    Rectangle().fill(.clear).contentShape(Rectangle())
+                        .gesture(
+                            SpatialTapGesture()  // グラフに触れている座標から、どの時刻に触れているのか検出
+                                .onEnded { value in
+                                    let item = findItem(location: value.location, proxy: proxy, geometry: nthGeometryItem)
+                                    if selectedItem?.date == item?.date {
+                                        // If tapping the same element, clear the selection.
+                                        selectedItem = nil
+                                    } else {
+                                        selectedItem = item
+                                    }
+                                }
+                                .exclusively(
+                                    before: DragGesture()
+                                        .onChanged { value in
+                                            selectedItem = findItem(location: value.location, proxy: proxy, geometry: nthGeometryItem)
+                                        }
+                                )
+                        )
                 }
             }
         } else {
