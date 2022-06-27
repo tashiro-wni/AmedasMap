@@ -92,8 +92,8 @@ struct PointView: View {
                     // グラフ
                     Text(selectedElement.title)
                         .bold()
-                    AmedasChartView(data: viewModel.selectedPointData, element: selectedElement, selectedItem: nil)
-                        .frame(width: geometry.size.width - 40, height: 150)
+                    AmedasChartView(data: viewModel.selectedPointData, element: selectedElement)
+                        .frame(width: geometry.size.width - 40)
 
                     // グラフ要素を選択
                     if viewModel.selectedPointElements.count > 1 {
@@ -143,12 +143,77 @@ struct PointView: View {
     }
 }
 
-// MARK: - AmedasChartView 要素ごとのグラフ
+// MARK: - AmedasChartView グラフ+吹き出し
 struct AmedasChartView: View {
     let data: [AmedasData]
     let element: AmedasElement
-    //@Binding var selectedItem: (date: Date, text: String)?
-    @State var selectedItem: (date: Date, text: String)?
+    @State private var selectedItem: (date: Date, text: String)? = nil
+    @Environment(\.layoutDirection) var layoutDirection
+
+    var body: some View {
+        VStack(alignment: .leading) {
+            VStack(alignment: .leading) {
+                Text(element.title)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
+            .opacity(selectedItem == nil ? 1 : 0)
+
+            InteractiveAmedasChart(data: data, element: element, selectedItem: $selectedItem)
+                .frame(height: 150)
+        }
+        .chartBackground { proxy in
+            ZStack(alignment: .topTrailing) {
+                GeometryReader { nthGeoItem in
+                    if let selectedItem = selectedItem {
+                        let dateInterval = Calendar.current.dateInterval(of: .minute, for: selectedItem.date)!
+                        let startPositionX1 = proxy.position(forX: dateInterval.start) ?? 0
+                        let startPositionX2 = proxy.position(forX: dateInterval.end) ?? 0
+                        let midStartPositionX = (startPositionX1 + startPositionX2) / 2 + nthGeoItem[proxy.plotAreaFrame].origin.x
+
+                        let lineX = layoutDirection == .rightToLeft ? nthGeoItem.size.width - midStartPositionX : midStartPositionX
+                        let lineHeight = nthGeoItem[proxy.plotAreaFrame].maxY
+                        let boxWidth: CGFloat = 140
+                        let boxOffset = max(0, min(nthGeoItem.size.width - boxWidth, lineX - boxWidth / 2))
+
+                        // 吹き出し
+                        Rectangle()
+                            .fill(.quaternary)
+                            .frame(width: 2, height: lineHeight)
+                            .position(x: lineX, y: lineHeight / 2)
+
+                        VStack(alignment: .trailing) {
+                            Text("\(selectedItem.date, format: .dateTime.month().day().hour().minute())")
+                                .font(.callout)
+                                .foregroundStyle(.secondary)
+                            Text(selectedItem.text)
+                                .font(.title3.bold())
+                                .foregroundColor(.primary)
+                        }
+                        .frame(width: boxWidth, alignment: .trailing)
+                        .background {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(.background)
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(.quaternary.opacity(0.7))
+                            }
+                            .padding([.leading, .trailing], -8)
+                            .padding([.top, .bottom], -4)
+                        }
+                        .offset(x: boxOffset)
+                    }
+                }
+            }
+        }
+    }
+}
+
+// MARK: - InteractiveAmedasChart グラフ
+struct InteractiveAmedasChart: View {
+    let data: [AmedasData]
+    let element: AmedasElement
+    @Binding var selectedItem: (date: Date, text: String)?
 
     // グラフのY軸描画範囲を決定
     func makeRange() -> (Double?, Double?) {

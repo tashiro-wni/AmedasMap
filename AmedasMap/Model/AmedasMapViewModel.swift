@@ -107,9 +107,8 @@ final class AmedasMapViewModel: ObservableObject {
     private func updateSelectedPointElements() {
         var elements: [AmedasElement] = []
         
-        guard let item = selectedPointData.reversed().filter({ $0.is0min }).first else { return }
         for element in AmedasElement.allCases {
-            if item.text(for: element) != item.invalidText {
+            if !selectedPointData.filter({ $0.text(for: element) != $0.invalidText }).isEmpty {
                 elements.append(element)
             }
         }
