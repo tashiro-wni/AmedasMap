@@ -67,13 +67,13 @@ struct PointView: View {
                viewModel.amedasPoints[viewModel.selectedPoint]?.pointNameJa ?? "",
                viewModel.selectedPoint) }
 
-    private let dateFormatter: DateFormatter = {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "H:mm"
-        dateFormatter.locale = .posix
-        dateFormatter.timeZone = .jst
-        return dateFormatter
-    }()
+//    private let dateFormatter: DateFormatter = {
+//        let dateFormatter = DateFormatter()
+//        dateFormatter.dateFormat = "H:mm"
+//        dateFormatter.locale = .posix
+//        dateFormatter.timeZone = .jst
+//        return dateFormatter
+//    }()
 
     // 画面が縦向きなら最大3要素、横向きなら最大6要素表示する
     private func displayElements(_ geometry: GeometryProxy) -> [AmedasElement] {
@@ -126,7 +126,7 @@ struct PointView: View {
                         ForEach(viewModel.selectedPointData.reversed().filter{ $0.is0min }, id: \.self) { item in
                             // 各時刻の観測値
                             GridRow() {
-                                Text(dateFormatter.string(from: item.date))
+                                Text(item.date, format: .dateTime.hour().minute())
                                 
                                 ForEach(displayElements(geometry), id: \.self) { element in
                                     Text(item.text(for: element))
@@ -140,6 +140,7 @@ struct PointView: View {
                 }
             }
         }
+        .environment(\.locale, .ja_JP)
     }
 }
 
@@ -183,7 +184,8 @@ struct AmedasChartView: View {
                             .position(x: lineX, y: lineHeight / 2)
 
                         VStack(alignment: .trailing) {
-                            Text("\(selectedItem.date, format: .dateTime.month().day().hour().minute())")
+                            Text(selectedItem.date, format: .dateTime.month().day().hour().minute())
+                            //Text(selectedItem.date.formatted(date: .short, time: .shortened))
                                 .font(.callout)
                                 .foregroundStyle(.secondary)
                             Text(selectedItem.text)
