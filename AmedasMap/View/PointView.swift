@@ -174,7 +174,7 @@ struct AmedasChartView: View {
 
                         let lineX = layoutDirection == .rightToLeft ? nthGeoItem.size.width - midStartPositionX : midStartPositionX
                         let lineHeight = nthGeoItem[proxy.plotAreaFrame].maxY
-                        let boxWidth: CGFloat = 140
+                        let boxWidth: CGFloat = 110
                         let boxOffset = max(0, min(nthGeoItem.size.width - boxWidth, lineX - boxWidth / 2))
 
                         // 吹き出し
@@ -186,10 +186,10 @@ struct AmedasChartView: View {
                         VStack(alignment: .trailing) {
                             Text(selectedItem.date, format: .dateTime.month().day().hour().minute())
                             //Text(selectedItem.date.formatted(date: .short, time: .shortened))
-                                .font(.callout)
+                                .font(.caption)
                                 .foregroundStyle(.secondary)
                             Text(selectedItem.text)
-                                .font(.title3.bold())
+                                .font(.callout.bold())
                                 .foregroundColor(.primary)
                         }
                         .frame(width: boxWidth, alignment: .trailing)
