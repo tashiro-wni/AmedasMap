@@ -224,8 +224,8 @@ struct InteractiveAmedasChart: View {
             return (nil, nil)
         }
 
-        return ( [ min, element.chartRange.min ].compactMap({ $0 }).min(),
-                 [ max, element.chartRange.max ].compactMap({ $0 }).max() )
+        return ( [ floor(min), element.chartRange.min ].compactMap({ $0 }).min(),
+                 [ ceil(max), element.chartRange.max ].compactMap({ $0 }).max() )
     }
 
     // 触れている箇所の座標から値を取得
