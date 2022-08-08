@@ -15,6 +15,7 @@ final class AmedasMapViewModel: ObservableObject {
     var dateText: String {
         if let date = date {
             return dateFormatter.string(from: date)
+            //return date.formatted(.dateTime.year().month().day().hour().minute().locale(.ja_JP))
         } else {
             return "Loading..."
         }

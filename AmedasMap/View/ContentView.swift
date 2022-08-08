@@ -27,7 +27,7 @@ private struct ElementPicker: View {
     var body: some View {
         Picker(selection: $viewModel.displayElement, label: EmptyView()) {
             ForEach(AmedasElement.allCases, id: \.self) { element in
-                element.image
+                element.image.accessibilityLabel(element.title)
             }
         }
         .pickerStyle(SegmentedPickerStyle())
@@ -54,6 +54,7 @@ private struct TimestampView: View {
                     .frame(width: 30, height: 30)
                     .background(Color.white)
                     .cornerRadius(4)
+                    //.accessibilityLabel("再読み込み")
             })
         }
     }

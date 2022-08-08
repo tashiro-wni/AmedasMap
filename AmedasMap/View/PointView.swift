@@ -9,17 +9,6 @@ import SwiftUI
 import Charts
 
 private extension AmedasElement {
-    var title: String {
-        switch self {
-        case .temperature:    return "気温"
-        case .precipitation:  return "降水量"
-        case .wind:           return "風速"
-        case .sun:            return "日照"
-        case .humidity:       return "湿度"
-        case .pressure:       return "気圧"
-        }
-    }
-    
     enum ChartType {
         case line, bar
     }
@@ -99,7 +88,7 @@ struct PointView: View {
                     if viewModel.selectedPointElements.count > 1 {
                         Picker(selection: $selectedElement, label: EmptyView()) {
                             ForEach(viewModel.selectedPointElements, id: \.self) { element in
-                                element.image
+                                element.image.accessibilityLabel(element.title)
                             }
                         }
                         .pickerStyle(SegmentedPickerStyle())

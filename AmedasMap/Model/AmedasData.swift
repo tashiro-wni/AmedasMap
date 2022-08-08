@@ -9,6 +9,17 @@ import Foundation
 
 enum AmedasElement: CaseIterable {
     case temperature, precipitation, wind, sun, humidity, pressure
+
+    var title: String {
+        switch self {
+        case .temperature:    return "気温"
+        case .precipitation:  return "降水量"
+        case .wind:           return "風速"
+        case .sun:            return "日照"
+        case .humidity:       return "湿度"
+        case .pressure:       return "気圧"
+        }
+    }
 }
 
 // MARK: - AmedasData
