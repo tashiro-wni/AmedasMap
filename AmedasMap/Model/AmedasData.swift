@@ -9,13 +9,24 @@ import Foundation
 
 enum AmedasElement: CaseIterable {
     case temperature, precipitation, wind, sun, humidity, pressure
+
+    var title: String {
+        switch self {
+        case .temperature:    return "気温"
+        case .precipitation:  return "降水量"
+        case .wind:           return "風速"
+        case .sun:            return "日照"
+        case .humidity:       return "湿度"
+        case .pressure:       return "気圧"
+        }
+    }
 }
 
 // MARK: - AmedasData
-struct AmedasData: Hashable, CustomStringConvertible {
+struct AmedasData: Hashable, Identifiable, CustomStringConvertible {
     let id = UUID()
     let pointID: String
-    let time: TimeInterval
+    let date: Date
     let temperature: Double?
     let precipitation1h: Double?
     let precipitation10m: Double?
@@ -26,7 +37,7 @@ struct AmedasData: Hashable, CustomStringConvertible {
     let pressure: Double?
 
     var is0min: Bool {  // 00分
-        Int(time).isMultiple(of: 3600)
+        Int(date.timeIntervalSince1970).isMultiple(of: 3600)
     }
     let invalidText = "-"
     private let directionText = [ "静穏", "北北東", "北東", "東北東", "東",
@@ -50,6 +61,23 @@ struct AmedasData: Hashable, CustomStringConvertible {
             return humidity != nil
         case .pressure:
             return pressure != nil
+        }
+    }
+
+    func value(for element: AmedasElement) -> Double? {
+        switch element {
+        case .temperature:
+            return temperature
+        case .precipitation:
+            return precipitation1h
+        case .wind:
+            return windSpeed
+        case .sun:
+            return sun1h
+        case .humidity:
+            return humidity
+        case .pressure:
+            return pressure
         }
     }
 
@@ -104,7 +132,7 @@ struct AmedasData: Hashable, CustomStringConvertible {
     var description: String {
         var ary: [String] = []
         ary.append(pointID)
-        ary.append("time:\(time)")
+        ary.append("time:\(date.timeIntervalSince1970)")
         ary.append("temp:" + temperatureText)
         ary.append("prec:" + precipitationText)
         ary.append("wind:" + windText)
@@ -142,7 +170,7 @@ enum AmedasDataLoader {
             throw LoadError.wrongUrl
         }
         LOG("load: " + url.absoluteString)
-        let (data, _) = try await URLSession.shared.data2(from: url)
+        let (data, _) = try await URLSession.shared.data(from: url)
         
         let formatter = ISO8601DateFormatter()
         formatter.timeZone = .jst
@@ -162,7 +190,7 @@ enum AmedasDataLoader {
             throw LoadError.wrongUrl
         }
         LOG("load: " + urlString)
-        let (data, _) = try await URLSession.shared.data2(from: url)
+        let (data, _) = try await URLSession.shared.data(from: url)
         guard let list = parseAmedasMapData(data: data, date: date) else {
             throw LoadError.parseError
         }
@@ -177,7 +205,7 @@ enum AmedasDataLoader {
         var list: [AmedasData] = []
         for item in json {
             let obs = AmedasData(pointID:          item.key,
-                                 time:             date.timeIntervalSince1970,
+                                 date:             date,
                                  temperature:      parseDouble(item.value["temp"]),
                                  precipitation1h:  parseDouble(item.value["precipitation1h"]),
                                  precipitation10m: parseDouble(item.value["precipitation10m"]),
@@ -211,7 +239,7 @@ enum AmedasDataLoader {
             }
         }
         // 全ての読み込みが完了したら、時系列にsortして返す
-        return allData.sorted(by: {$0.time < $1.time})
+        return allData.sorted(by: {$0.date < $1.date}).suffix(24 * 6)
     }
     
     // 指定地点の時系列観測値(1ファイル、最大3時間分)を取得
@@ -222,7 +250,7 @@ enum AmedasDataLoader {
             throw LoadError.wrongUrl
         }
         LOG("load: " + urlString)
-        let (data, _) = try await URLSession.shared.data2(from: url)
+        let (data, _) = try await URLSession.shared.data(from: url)
         guard let list = parseAmedasPointData(data: data, point: point) else {
             throw LoadError.parseError
         }
@@ -239,7 +267,7 @@ enum AmedasDataLoader {
         for item in json {
             guard let date = dateFormatter.date(from: item.key) else { continue }
             let obs = AmedasData(pointID:          point,
-                                 time:             date.timeIntervalSince1970,
+                                 date:             date,
                                  temperature:      parseDouble(item.value["temp"]),
                                  precipitation1h:  parseDouble(item.value["precipitation1h"]),
                                  precipitation10m: parseDouble(item.value["precipitation10m"]),

@@ -7,15 +7,15 @@
 
 import SwiftUI
 
-private extension AmedasElement {
+extension AmedasElement {
     var image: Image {
         switch self {
         case .temperature:    return Image(systemName: "thermometer")
         case .precipitation:  return Image(systemName: "cloud.rain")
         case .wind:           return Image(systemName: "wind")
         case .sun:            return Image(systemName: "sun.max")
-        case .humidity:       return Image(systemName: "drop")
-        case .pressure:       return Image(systemName: "timer.square")
+        case .humidity:       return Image(systemName: "humidity")
+        case .pressure:       return Image(systemName: "rectangle.compress.vertical")
         }
     }
 }
@@ -27,7 +27,7 @@ private struct ElementPicker: View {
     var body: some View {
         Picker(selection: $viewModel.displayElement, label: EmptyView()) {
             ForEach(AmedasElement.allCases, id: \.self) { element in
-                element.image
+                element.image.accessibilityLabel(element.title)
             }
         }
         .pickerStyle(SegmentedPickerStyle())
@@ -54,6 +54,7 @@ private struct TimestampView: View {
                     .frame(width: 30, height: 30)
                     .background(Color.white)
                     .cornerRadius(4)
+                    //.accessibilityLabel("再読み込み")
             })
         }
     }
@@ -94,7 +95,7 @@ struct ContentView: View {
             }
         }
         .sheet(isPresented: $viewModel.showModal) {
-            PointView(viewModel: viewModel)
+            PointView(viewModel: viewModel, selectedElement: viewModel.displayElement)
         }
         .alert(isPresented: $viewModel.hasError) {
             // エラー時にはAlertを表示する

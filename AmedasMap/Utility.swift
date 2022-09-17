@@ -18,6 +18,7 @@ public func LOG(_ body: String, filename: String = #file, line: Int = #line) {
 
 extension Locale {
     static let posix = Locale(identifier: "en_US_POSIX")
+    static let ja_JP = Locale(identifier: "ja_JP")
 }
 
 extension TimeZone {
