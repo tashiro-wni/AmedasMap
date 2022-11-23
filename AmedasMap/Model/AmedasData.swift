@@ -151,12 +151,6 @@ enum AmedasDataLoader {
         let data: [AmedasData]
     }
     
-    enum LoadError: Error {
-        case wrongUrl
-        case httpError
-        case parseError
-    }
-    
     private static let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = .posix
@@ -238,7 +232,7 @@ enum AmedasDataLoader {
                 allData.append(contentsOf: list)
             }
         }
-        // 全ての読み込みが完了したら、時系列にsortして返す
+        // 全ての読み込みが完了したら、時系列にsortして直近24時間分を返す
         return allData.sorted(by: {$0.date < $1.date}).suffix(24 * 6)
     }
     
