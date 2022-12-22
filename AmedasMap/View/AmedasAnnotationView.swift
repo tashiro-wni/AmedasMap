@@ -15,7 +15,7 @@ private extension AmedasElement {
     
     var iconShape: Shape {
         switch self {
-        case .temperature, .precipitation, .sun, .humidity, .pressure:
+        case .temperature, .precipitation, .sun, .humidity, .pressure, .snow:
             return .circle
         case .wind:
             return .arrow
@@ -34,7 +34,9 @@ extension AmedasData {
         .wind:          [ "#999999", "#002CB2", "#5FB235", "#FFBF00", "#FF7F00", "#D90000" ],
         .sun:           [ "#999999", "#FFFF00", "#FFA500" ],
         .humidity:      [ "#999999", "#45A3E5", "#002CB2" ],
-        .pressure:      [ "#999999" ]]
+        .pressure:      [ "#999999" ],
+        .snow:          [ "#FAFAFA", "#E6E6E6", "#AAAAAA", "#8C8C8C",
+                          "#5777B0", "#2A5DB7", "#8955B3", "#6410AA" ]]
 
     static var allIdentifiers: [String] {
         var list: [String] = []
@@ -69,7 +71,7 @@ extension AmedasData {
         
         switch element {
         case .temperature:
-            guard let temperature = temperature else { return nil }
+            guard let temperature else { return nil }
             switch temperature {
             case  35 ... 100:  colorIndex = 9
             case  30 ..<  35:  colorIndex = 8
@@ -86,11 +88,11 @@ extension AmedasData {
             ary = [ element.iconShape.rawValue, colors[colorIndex] ]
 
         case .precipitation:
-            guard let precipitation1h = precipitation1h else { return nil }
+            guard let precipitation1h else { return nil }
             switch precipitation1h {
             case 99 ... 500:  colorIndex = 8
-            case 64 ...  99:  colorIndex = 7
-            case 32 ...  64:  colorIndex = 6
+            case 64 ..<  99:  colorIndex = 7
+            case 32 ..<  64:  colorIndex = 6
             case 16 ..<  32:  colorIndex = 5
             case  8 ..<  16:  colorIndex = 4
             case  4 ..<   8:  colorIndex = 3
@@ -102,7 +104,7 @@ extension AmedasData {
             ary = [ element.iconShape.rawValue, colors[colorIndex] ]
 
         case .wind:
-            guard let windDirection = windDirection, let windSpeed = windSpeed else { return nil }
+            guard let windDirection, let windSpeed else { return nil }
             switch windSpeed {
             case 25 ... 99:  colorIndex = 5
             case 20 ..< 25:  colorIndex = 4
@@ -115,7 +117,7 @@ extension AmedasData {
             ary = [ element.iconShape.rawValue, String(windDirection), colors[colorIndex] ]
             
         case .sun:
-            guard let sun1h = sun1h else { return nil }
+            guard let sun1h else { return nil }
             switch sun1h * 60 {
             case 40 ... 60:  colorIndex = 2
             case 20 ..< 40:  colorIndex = 1
@@ -125,11 +127,11 @@ extension AmedasData {
             ary = [ element.iconShape.rawValue, colors[colorIndex] ]
             
         case .humidity:
-            guard let humidity = humidity else { return nil }
+            guard let humidity else { return nil }
             switch humidity {
-            case 75 ... 100: colorIndex = 2
-            case 50 ..<  75: colorIndex = 1
-            case  0 ..<  50: colorIndex = 0
+            case 75 ... 100:  colorIndex = 2
+            case 50 ..<  75:  colorIndex = 1
+            case  0 ..<  50:  colorIndex = 0
             default:  return nil
             }
             ary = [ element.iconShape.rawValue, colors[colorIndex] ]
@@ -137,6 +139,21 @@ extension AmedasData {
         case .pressure:
             guard pressure != nil else { return nil }
             ary = [ element.iconShape.rawValue, colors[0] ]
+            
+        case .snow:
+            guard let snow else { return nil }
+            switch snow {
+            case 300 ... 2000:  colorIndex = 7
+            case 200 ..<  300:  colorIndex = 6
+            case 150 ..<  200:  colorIndex = 5
+            case 100 ..<  150:  colorIndex = 4
+            case  50 ..<  100:  colorIndex = 3
+            case  20 ..<   50:  colorIndex = 2
+            case   5 ..<   20:  colorIndex = 1
+            case   0 ..<    5:  colorIndex = 0
+            default:  return nil
+            }
+            ary = [ element.iconShape.rawValue, colors[colorIndex] ]
         }
         
         return ary.joined(separator: ",")
@@ -175,7 +192,7 @@ final class AmedasAnnotationView: MKAnnotationView {
         collisionMode = .circle
         rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
 
-        guard let reuseIdentifier = reuseIdentifier else { return }
+        guard let reuseIdentifier else { return }
         let ary = reuseIdentifier.components(separatedBy: ",")
         if ary.count == 2, ary[0] == AmedasElement.Shape.circle.rawValue, let color = UIColor(hex: ary[1]) {
             drawCircle(color: color)

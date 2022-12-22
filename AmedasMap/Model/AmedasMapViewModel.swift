@@ -90,7 +90,7 @@ final class AmedasMapViewModel: ObservableObject {
     @MainActor
     func loadPointData(_ point: String) {
         LOG(#function + ", point:\(point)")
-        guard let date = date else { return }
+        guard let date else { return }
         selectedPoint = point
 
         Task {

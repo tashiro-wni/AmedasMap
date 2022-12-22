@@ -8,7 +8,7 @@
 import Foundation
 
 enum AmedasElement: CaseIterable {
-    case temperature, precipitation, wind, sun, humidity, pressure
+    case temperature, precipitation, wind, sun, humidity, pressure, snow
 
     var title: String {
         switch self {
@@ -18,6 +18,7 @@ enum AmedasElement: CaseIterable {
         case .sun:            return "日照"
         case .humidity:       return "湿度"
         case .pressure:       return "気圧"
+        case .snow:           return "積雪深"
         }
     }
 }
@@ -35,6 +36,7 @@ struct AmedasData: Hashable, Identifiable, CustomStringConvertible {
     let sun1h: Double?
     let humidity: Double?
     let pressure: Double?
+    let snow: Double?
 
     var is0min: Bool {  // 00分
         Int(date.timeIntervalSince1970).isMultiple(of: 3600)
@@ -50,10 +52,10 @@ struct AmedasData: Hashable, Identifiable, CustomStringConvertible {
         case .temperature:
             return temperature != nil
         case .precipitation:
-            guard let precipitation1h = precipitation1h else { return false }
+            guard let precipitation1h else { return false }
             return precipitation1h > 0
         case .wind:
-            guard let windDirection = windDirection, windDirection >= 0, windDirection < directionText.count else { return false }
+            guard let windDirection, windDirection >= 0, windDirection < directionText.count else { return false }
             return windSpeed != nil
         case .sun:
             return sun1h != nil
@@ -61,6 +63,9 @@ struct AmedasData: Hashable, Identifiable, CustomStringConvertible {
             return humidity != nil
         case .pressure:
             return pressure != nil
+        case .snow:
+            guard let snow else { return false }
+            return snow > 0
         }
     }
 
@@ -78,6 +83,8 @@ struct AmedasData: Hashable, Identifiable, CustomStringConvertible {
             return humidity
         case .pressure:
             return pressure
+        case .snow:
+            return snow
         }
     }
 
@@ -95,38 +102,45 @@ struct AmedasData: Hashable, Identifiable, CustomStringConvertible {
             return humidityText
         case .pressure:
             return pressureText
+        case .snow:
+            return snowText
         }
     }
     
     private var temperatureText: String {
-        guard let temperature = temperature else { return invalidText }
+        guard let temperature else { return invalidText }
         return String(format: "%.1f℃", temperature)
     }
 
     private var precipitationText: String {
-        guard let precipitation = precipitation1h else { return invalidText }
-        return String(format: "%.1fmm/h", precipitation)
+        guard let precipitation1h else { return invalidText }
+        return String(format: "%.1fmm/h", precipitation1h)
     }
 
     private var windText: String {
-        guard let windDir = windDirection, windDir >= 0, windDir < directionText.count,
-              let windSpeed = windSpeed else { return invalidText }
-        return String(format: "%@ %.1fm/s", directionText[windDir], windSpeed)
+        guard let windDirection, windDirection >= 0, windDirection < directionText.count,
+              let windSpeed else { return invalidText }
+        return String(format: "%@ %.1fm/s", directionText[windDirection], windSpeed)
     }
     
     private var sunText: String {
-        guard let sun1h = sun1h else { return invalidText }
+        guard let sun1h else { return invalidText }
         return String(format: "%.0fmin", sun1h * 60)
     }
     
     private var humidityText: String {
-        guard let humidity = humidity else { return invalidText }
+        guard let humidity else { return invalidText }
         return String(format: "%.0f%%", humidity)
     }
     
     private var pressureText: String {
-        guard let pressure = pressure else { return invalidText }
+        guard let pressure else { return invalidText }
         return String(format: "%.1fhPa", pressure)
+    }
+    
+    private var snowText: String {
+        guard let snow else { return invalidText }
+        return String(format: "%.0fcm", snow)
     }
 
     var description: String {
@@ -139,6 +153,7 @@ struct AmedasData: Hashable, Identifiable, CustomStringConvertible {
         ary.append("sun:" + sunText)
         ary.append("hum:" + humidityText)
         ary.append("pres:" + pressureText)
+        ary.append("snow:" + snowText)
 
         return ary.joined(separator: ", ")
     }
@@ -207,7 +222,8 @@ enum AmedasDataLoader {
                                  windSpeed:        parseDouble(item.value["wind"]),
                                  sun1h:            parseDouble(item.value["sun1h"]),
                                  humidity:         parseDouble(item.value["humidity"]),
-                                 pressure:         parseDouble(item.value["pressure"]))
+                                 pressure:         parseDouble(item.value["pressure"]),
+                                 snow:             parseDouble(item.value["snow"]))
             list.append(obs)
         }
         return list
@@ -269,7 +285,8 @@ enum AmedasDataLoader {
                                  windSpeed:        parseDouble(item.value["wind"]),
                                  sun1h:            parseDouble(item.value["sun1h"]),
                                  humidity:         parseDouble(item.value["humidity"]),
-                                 pressure:         parseDouble(item.value["pressure"])
+                                 pressure:         parseDouble(item.value["pressure"]),
+                                 snow:             parseDouble(item.value["snow"])
             )
             list.append(obs)
         }

@@ -21,6 +21,7 @@ private extension AmedasElement {
         case .sun:            return .bar
         case .humidity:       return .line
         case .pressure:       return .line
+        case .snow:           return .bar
         }
     }
     
@@ -32,6 +33,7 @@ private extension AmedasElement {
         case .sun:            return .orange
         case .humidity:       return .cyan
         case .pressure:       return .green
+        case .snow:           return .cyan
         }
     }
 
@@ -43,6 +45,7 @@ private extension AmedasElement {
         case .sun:            return (min: 0.0, max: 1.0)
         case .humidity:       return (min: 0.0, max: 100.0)
         case .pressure:       return (min: nil, max: nil)
+        case .snow:           return (min: 0.0, max: 4.0)
         }
     }
 }
@@ -66,7 +69,7 @@ struct PointView: View {
 
     // 画面が縦向きなら最大3要素、横向きなら最大6要素表示する
     private func displayElements(_ geometry: GeometryProxy) -> [AmedasElement] {
-        let max = geometry.size.width > geometry.size.height ? 6 : 3
+        let max = geometry.size.width > geometry.size.height ? 7 : 3
         return Array(viewModel.selectedPointElements.prefix(max))
     }
 

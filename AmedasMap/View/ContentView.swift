@@ -16,6 +16,7 @@ extension AmedasElement {
         case .sun:            return Image(systemName: "sun.max")
         case .humidity:       return Image(systemName: "humidity")
         case .pressure:       return Image(systemName: "rectangle.compress.vertical")
+        case .snow:           return Image(systemName: "snowflake")
         }
     }
 }
