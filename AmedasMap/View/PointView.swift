@@ -10,7 +10,7 @@ import Charts
 
 private extension AmedasElement {
     enum ChartType {
-        case line, bar
+        case line, bar, area
     }
     
     var chartType: ChartType {
@@ -21,7 +21,7 @@ private extension AmedasElement {
         case .sun:            return .bar
         case .humidity:       return .line
         case .pressure:       return .line
-        case .snow:           return .bar
+        case .snow:           return .area
         }
     }
     
@@ -58,14 +58,6 @@ struct PointView: View {
         String(format: "%@(%@)",
                viewModel.amedasPoints[viewModel.selectedPoint]?.pointNameJa ?? "",
                viewModel.selectedPoint) }
-
-//    private let dateFormatter: DateFormatter = {
-//        let dateFormatter = DateFormatter()
-//        dateFormatter.dateFormat = "H:mm"
-//        dateFormatter.locale = .posix
-//        dateFormatter.timeZone = .jst
-//        return dateFormatter
-//    }()
 
     // 画面が縦向きなら最大3要素、横向きなら最大6要素表示する
     private func displayElements(_ geometry: GeometryProxy) -> [AmedasElement] {
@@ -230,12 +222,12 @@ struct InteractiveAmedasChart: View {
         var index: Int? = nil
         for i in data.indices {
             let distance = data[i].date.distance(to: date)
-            if abs(distance) < minDistance {
+            if abs(distance) < minDistance, data[i].value(for: element) != nil {
                 minDistance = abs(distance)
                 index = i
             }
         }
-        if let index = index {
+        if let index {
             return (date: data[index].date, text: data[index].text(for: element))
         } else {
             return nil
@@ -247,15 +239,22 @@ struct InteractiveAmedasChart: View {
         if let min = min, let max = max {
             Chart(data, id: \.self) { item in
                 if let value = item.value(for: element) {
-                    if element.chartType == .bar {
+                    switch element.chartType {
+                    case .line:
+                        LineMark(
+                            x: .value("時刻", item.date, unit: .minute),
+                            y: .value(element.title, value)
+                        )
+                        .foregroundStyle(element.chartColor)
+                    case .bar:
                         BarMark(
                             x: .value("時刻", item.date, unit: .minute),
                             y: .value(element.title, value),
                             width: 2
                         )
                         .foregroundStyle(element.chartColor)
-                    } else {
-                        LineMark(
+                    case .area:
+                        AreaMark(
                             x: .value("時刻", item.date, unit: .minute),
                             y: .value(element.title, value)
                         )
