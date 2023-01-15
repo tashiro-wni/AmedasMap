@@ -96,7 +96,13 @@ struct ContentView: View {
             }
         }
         .sheet(isPresented: $viewModel.showModal) {
-            PointView(viewModel: viewModel, selectedElement: viewModel.displayElement)
+            NavigationView {
+                PointView(viewModel: viewModel, selectedElement: viewModel.displayElement)
+                    .navigationTitle(viewModel.selectedPointName)
+                    .navigationBarTitleDisplayMode(.inline)
+                    .navigationBarItems(trailing: Button(action: { viewModel.showModal = false },
+                                                         label: { Image(systemName: "xmark") }))
+            }
         }
         .alert(isPresented: $viewModel.hasError) {
             // エラー時にはAlertを表示する

@@ -27,7 +27,14 @@ final class AmedasMapViewModel: ObservableObject {
     @Published var displayElement: AmedasElement = .temperature
     
     @Published var showModal: Bool = false
-    private(set) var selectedPoint: String = ""
+    private(set) var selectedPoint: String = "" {
+        didSet {
+            selectedPointName = String(format: "%@(%@)",
+                                               amedasPoints[selectedPoint]?.pointNameJa ?? "",
+                                               selectedPoint)
+        }
+    }
+    private(set) var selectedPointName: String = ""
     private(set) var selectedPointData: [AmedasData] = [] {
         didSet {
             showModal = true
