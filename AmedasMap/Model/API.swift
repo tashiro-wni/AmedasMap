@@ -14,3 +14,9 @@ enum API {
     static let amedasMapData    = baseUrl + "/data/map/%@00.json"      // アメダス 指定時刻の観測値
     static let amedasPointData  = baseUrl + "/data/point/%@/%@.json"   // アメダス 指定地点の時系列観測値
 }
+
+enum LoadError: Error {
+    case wrongUrl
+    case httpError
+    case parseError
+}

@@ -45,14 +45,14 @@ final class AmedasMapViewModel: ObservableObject {
     
     // MARK: -
     init() {
-        Task() {
+        Task {
             await loadPoints()
             await loadMapData()
         }
     }
     
     func reload() {
-        Task() {
+        Task {
             await loadMapData()
         }
     }
@@ -90,10 +90,10 @@ final class AmedasMapViewModel: ObservableObject {
     @MainActor
     func loadPointData(_ point: String) {
         LOG(#function + ", point:\(point)")
-        guard let date = date else { return }
+        guard let date else { return }
         selectedPoint = point
 
-        Task() {
+        Task {
             do {
                 selectedPointData = try await AmedasDataLoader.load(point: point, date: date)
                 updateSelectedPointElements()

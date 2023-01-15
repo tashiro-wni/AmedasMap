@@ -22,12 +22,6 @@ struct AmedasPoint: CustomStringConvertible {
 
 // MARK: - AmedasTableLoader
 enum AmedasTableLoader {
-    enum LoadError: Error {
-        case wrongUrl
-        case httpError
-        case parseError
-    }
-    
     static func load() async throws -> [String: AmedasPoint] {
         guard let url = URL(string: API.amedasPointTable) else {
             throw LoadError.wrongUrl
