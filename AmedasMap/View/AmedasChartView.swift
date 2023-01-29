@@ -59,12 +59,10 @@ struct AmedasChartView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            VStack(alignment: .leading) {
-                Text(element.title)
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
-            }
-            .opacity(selectedItem == nil ? 1 : 0)
+            Text(element.title)
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .opacity(selectedItem == nil ? 1 : 0)
 
             InteractiveAmedasChart(data: data, element: element, selectedItem: $selectedItem)
                 .frame(height: 150)
@@ -124,7 +122,7 @@ struct InteractiveAmedasChart: View {
     @Binding var selectedItem: (date: Date, text: String)?
 
     // グラフのY軸描画範囲を決定
-    func makeRange() -> (Double?, Double?) {
+    private func makeRange() -> (Double?, Double?) {
         guard let min = data.compactMap({ $0.value(for: element) }).min(),
               let max = data.compactMap({ $0.value(for: element) }).max() else {
             return (nil, nil)
@@ -135,7 +133,7 @@ struct InteractiveAmedasChart: View {
     }
 
     // 触れている箇所の座標から値を取得
-    func findItem(location: CGPoint, proxy: ChartProxy, geometry: GeometryProxy) -> (date: Date, text: String)? {
+    private func findItem(location: CGPoint, proxy: ChartProxy, geometry: GeometryProxy) -> (date: Date, text: String)? {
         let relativeXPosition = location.x - geometry[proxy.plotAreaFrame].origin.x
         guard let date = proxy.value(atX: relativeXPosition) as Date? else { return nil }
 
@@ -193,8 +191,9 @@ struct InteractiveAmedasChart: View {
                         AxisTick()
                         // see Date.FormatStyle
                         // https://developer.apple.com/documentation/foundation/date/formatstyle
-                        // DateFormatter "H" 相当、必要なら .locale() を追加
-                        AxisValueLabel(format: .dateTime.hour(.defaultDigits(amPM: .omitted)))
+                        // DateFormatter "H:mm" 相当、.locale(.ja_JP) で強制的に24時間表記に。
+                        // .minute() をカットすると「18時」と「時」が表示される
+                        AxisValueLabel(format: .dateTime.locale(.ja_JP).hour(.defaultDigits(amPM: .omitted)).minute())
                     }
                 }
             }
