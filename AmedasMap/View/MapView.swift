@@ -10,9 +10,9 @@ import MapKit
 
 struct MapView: UIViewRepresentable {
     typealias UIViewType = MKMapView
-    let mapView = MKMapView()
+    private let mapView = MKMapView()
 
-    @StateObject var viewModel: AmedasMapViewModel
+    @EnvironmentObject private var viewModel: AmedasMapViewModel
     
     func makeUIView(context: Context) -> MKMapView {
         //LOG(#function)
@@ -29,7 +29,7 @@ struct MapView: UIViewRepresentable {
     
     func updateUIView(_ uiView: MKMapView, context: Context) {
         //LOG(#function)
-        context.coordinator.updateAnnotations(viewModel: viewModel)
+        context.coordinator.updateAnnotations()
     }
     
     func makeCoordinator() -> Coordinator {
@@ -54,16 +54,17 @@ struct MapView: UIViewRepresentable {
             }
         }
         
-        func updateAnnotations(viewModel: AmedasMapViewModel) {
+        func updateAnnotations() {
             parent.mapView.removeAnnotations(annotations)
             annotations.removeAll()
             
+            let viewModel = parent.viewModel
             for data in viewModel.amedasData {
-                if let point = viewModel.amedasPoints[data.pointID], data.hasValidData(for: parent.viewModel.displayElement) {
-                    annotations.append(AmedasAnnotation(point: point, data: data, element: parent.viewModel.displayElement))
+                if let point = viewModel.amedasPoints[data.pointID], data.hasValidData(for: viewModel.displayElement) {
+                    annotations.append(AmedasAnnotation(point: point, data: data, element: viewModel.displayElement))
                 }
             }
-            LOG(#function + ", \(viewModel.dateText), \(parent.viewModel.displayElement), plot \(annotations.count) points.")
+            LOG(#function + ", \(viewModel.dateText), \(viewModel.displayElement), plot \(annotations.count) points.")
             parent.mapView.addAnnotations(annotations)
             parent.mapView.setNeedsDisplay()
         }

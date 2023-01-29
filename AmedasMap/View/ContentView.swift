@@ -23,8 +23,8 @@ extension AmedasElement {
 
 // MARK: - ElementPicker 表示要素を選択
 private struct ElementPicker: View {
-    @StateObject var viewModel: AmedasMapViewModel
-    
+    @EnvironmentObject private var viewModel: AmedasMapViewModel
+
     var body: some View {
         Picker(selection: $viewModel.displayElement, label: EmptyView()) {
             ForEach(AmedasElement.allCases, id: \.self) { element in
@@ -38,7 +38,7 @@ private struct ElementPicker: View {
 
 // MARK: - TimestampView データの時刻, 再読み込みボタン
 private struct TimestampView: View {
-    @StateObject var viewModel: AmedasMapViewModel
+    @EnvironmentObject private var viewModel: AmedasMapViewModel
 
     var body: some View {
         HStack(spacing: 10) {
@@ -64,31 +64,31 @@ private struct TimestampView: View {
 // MARK: - ContentView
 struct ContentView: View {
     @Environment(\.scenePhase) private var phase
-    @StateObject private var viewModel = AmedasMapViewModel()
+    @EnvironmentObject private var viewModel: AmedasMapViewModel
 
     var body: some View {
         ZStack {
-            MapView(viewModel: viewModel)
+            MapView()
                 .edgesIgnoringSafeArea(.all)
                   
             GeometryReader { geometry in
                 if geometry.size.width < 500 {
                     VStack {
                         // 時刻・再読み込みボタン
-                        TimestampView(viewModel: viewModel)
+                        TimestampView()
                         
                         // 表示要素を選択
-                        ElementPicker(viewModel: viewModel)
+                        ElementPicker()
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
                     .padding(24)
                 } else {
                     HStack {
                         // 時刻・再読み込みボタン
-                        TimestampView(viewModel: viewModel)
+                        TimestampView()
                         
                         // 表示要素を選択
-                        ElementPicker(viewModel: viewModel)
+                        ElementPicker()
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
                     .padding(8)
@@ -97,7 +97,7 @@ struct ContentView: View {
         }
         .sheet(isPresented: $viewModel.showModal) {
             NavigationView {
-                PointView(viewModel: viewModel, selectedElement: viewModel.displayElement)
+                PointView(selectedElement: viewModel.displayElement)
                     .navigationTitle(viewModel.selectedPointName)
                     .navigationBarTitleDisplayMode(.inline)
                     .navigationBarItems(trailing: Button(action: { viewModel.showModal = false },

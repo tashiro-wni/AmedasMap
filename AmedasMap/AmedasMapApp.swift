@@ -12,6 +12,7 @@ struct AmedasMapApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(AmedasMapViewModel())
         }
     }
 }

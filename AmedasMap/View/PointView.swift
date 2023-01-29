@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PointView: View {
-    @StateObject var viewModel: AmedasMapViewModel
+    @EnvironmentObject private var viewModel: AmedasMapViewModel
     @State var selectedElement: AmedasElement
 
     // 画面が縦向きなら最大3要素、横向きなら最大7要素表示する
