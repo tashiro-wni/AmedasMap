@@ -54,7 +54,7 @@ private extension AmedasElement {
 struct AmedasChartView: View {
     let data: [AmedasData]
     let element: AmedasElement
-    @State private var selectedItem: (date: Date, text: String)? = nil
+    @Binding var selectedItem: (date: Date, text: String)?
     @Environment(\.layoutDirection) var layoutDirection
 
     var body: some View {

@@ -10,6 +10,7 @@ import SwiftUI
 struct PointView: View {
     @EnvironmentObject private var viewModel: AmedasMapViewModel
     @State var selectedElement: AmedasElement
+    @State var selectedItem: (date: Date, text: String)? = nil
 
     // 画面が縦向きなら最大3要素、横向きなら最大7要素表示する
     private func displayElements(_ geometry: GeometryProxy) -> [AmedasElement] {
@@ -23,7 +24,7 @@ struct PointView: View {
                 // グラフ
                 Text(selectedElement.title)
                     .bold()
-                AmedasChartView(data: viewModel.selectedPointData, element: selectedElement)
+                AmedasChartView(data: viewModel.selectedPointData, element: selectedElement, selectedItem: $selectedItem)
                     .frame(width: geometry.size.width - 40)
                 
                 // グラフ要素を選択
@@ -35,6 +36,7 @@ struct PointView: View {
                     }
                     .pickerStyle(SegmentedPickerStyle())
                     .frame(width: 250)
+                    .onChange(of: selectedElement, perform: { _ in selectedItem = nil })
                 }
                 Divider()
                 
