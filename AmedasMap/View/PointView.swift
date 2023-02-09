@@ -69,7 +69,7 @@ struct PointView: View {
                         .lineLimit(1)
                         Divider()
                     }
-                    .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 16, weight: .regular)))
+                    .font(.body.monospacedDigit())
                 }
             }
         }
