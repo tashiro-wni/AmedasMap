@@ -90,10 +90,10 @@ struct AmedasChartView: View {
                         VStack(alignment: .trailing) {
                             Text(selectedItem.date, format: .dateTime.month().day().hour().minute())
                             //Text(selectedItem.date.formatted(date: .short, time: .shortened))
-                                .font(.caption)
+                                .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 14, weight: .regular)))
                                 .foregroundStyle(.secondary)
                             Text(selectedItem.text)
-                                .font(.callout.bold())
+                                .font(Font(UIFont.monospacedDigitSystemFont(ofSize: 14, weight: .bold)))
                                 .foregroundColor(.primary)
                         }
                         .frame(width: boxWidth, alignment: .trailing)
