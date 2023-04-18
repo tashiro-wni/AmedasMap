@@ -69,6 +69,7 @@ struct PointView: View {
                         .lineLimit(1)
                         Divider()
                     }
+                    .font(.body.monospacedDigit())
                 }
             }
         }

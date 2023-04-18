@@ -248,15 +248,14 @@ final class AmedasAnnotationView: MKAnnotationView {
         
         // 矢羽を描画
         let path = UIBezierPath()
-        path.move(to: CGPoint(x: rect.midX, y: rect.midY - 1.0))
-        path.addLine(to: CGPoint(x: rect.midX + 5.0, y: rect.midY - 5.0))
-        path.addLine(to: CGPoint(x: rect.midX, y: rect.midY + 7.0))
-        path.addLine(to: CGPoint(x: rect.midX - 5.0, y: rect.midY - 5.0))
+        path.move(to: CGPoint(x: 0, y: -1.0))
+        path.addLine(to: CGPoint(x: 5.0, y: -5.0))
+        path.addLine(to: CGPoint(x: 0, y: 7.0))
+        path.addLine(to: CGPoint(x: -5.0, y: -5.0))
         path.close()
         
         // 方角にあわせて回転
         let rotation: CGFloat = 2 * .pi * CGFloat(direction) / 16
-        path.apply(CGAffineTransform(translationX: -rect.midX, y: -rect.midY))
         path.apply(CGAffineTransform(rotationAngle: rotation))
         path.apply(CGAffineTransform(translationX: rect.midX, y: rect.midY))
         
