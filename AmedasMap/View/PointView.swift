@@ -25,7 +25,7 @@ struct PointView: View {
                 Text(selectedElement.title)
                     .bold()
                 AmedasChartView(data: viewModel.selectedPointData, element: selectedElement, selectedItem: $selectedItem)
-                    .frame(width: geometry.size.width - 40)
+                    .padding(.horizontal, 20)
                 
                 // グラフ要素を選択
                 if viewModel.selectedPointElements.count > 1 {
