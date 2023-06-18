@@ -13,7 +13,7 @@ final class AmedasMapViewModel: ObservableObject {
     @Published private(set) var amedasData: [AmedasData] = []
     @Published private(set) var date: Date?
     var dateText: String {
-        if let date = date {
+        if let date {
             return dateFormatter.string(from: date)
             //return date.formatted(.dateTime.year().month().day().hour().minute().locale(.ja_JP))
         } else {
@@ -26,7 +26,8 @@ final class AmedasMapViewModel: ObservableObject {
     }
     @Published var displayElement: AmedasElement = .temperature
     
-    @Published var showModal: Bool = false
+    // 地点詳細画面
+    @Published var showPointView: Bool = false
     private(set) var selectedPoint: String = "" {
         didSet {
             selectedPointName = String(format: "%@(%@)",
@@ -37,11 +38,20 @@ final class AmedasMapViewModel: ObservableObject {
     private(set) var selectedPointName: String = ""
     private(set) var selectedPointData: [AmedasData] = [] {
         didSet {
-            showModal = true
+            showPointView = true
         }
     }
     private(set) var selectedPointElements: [AmedasElement] = []
     
+    // 地点検索
+    @Published var showSearchView = false
+    @Published var searchText = ""
+    var filterdPoints: [AmedasPoint] {
+        amedasPoints.values
+            .filter { $0.pointNameJa.contains(searchText) }
+            .sorted(by: { $0.pointID < $1.pointID })
+    }
+
     private let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy/M/d H:mm"

@@ -70,7 +70,7 @@ struct AmedasChartView: View {
         .chartBackground { proxy in
             ZStack(alignment: .topTrailing) {
                 GeometryReader { nthGeoItem in
-                    if let selectedItem = selectedItem {
+                    if let selectedItem {
                         let dateInterval = Calendar.current.dateInterval(of: .minute, for: selectedItem.date)!
                         let startPositionX1 = proxy.position(forX: dateInterval.start) ?? 0
                         let startPositionX2 = proxy.position(forX: dateInterval.end) ?? 0
@@ -156,7 +156,7 @@ struct InteractiveAmedasChart: View {
 
     var body: some View {
         let (min, max) = makeRange()
-        if let min = min, let max = max {
+        if let min, let max {
             Chart(data, id: \.self) { item in
                 if let value = item.value(for: element) {
                     switch element.chartType {
