@@ -46,9 +46,7 @@ private struct TimestampView: View {
             Text(viewModel.dateText)
             
             // 再読み込みボタン
-            Button(action: {
-                viewModel.reload()
-            }, label: {
+            Button(action: { viewModel.reload() }) {
                 Image(systemName: "gobackward")
                     .resizable()
                     .padding(8)
@@ -56,7 +54,18 @@ private struct TimestampView: View {
                     .background(Color.white)
                     .cornerRadius(4)
                     //.accessibilityLabel("再読み込み")
-            })
+            }
+            
+            // 検索ボタン
+            Button(action: { viewModel.showSearchView = true }) {
+                Image(systemName: "magnifyingglass")
+                    .resizable()
+                    .padding(8)
+                    .frame(width: 30, height: 30)
+                    .background(Color.white)
+                    .cornerRadius(4)
+                    //.accessibilityLabel("検索")
+            }
         }
     }
 }
@@ -95,14 +104,21 @@ struct ContentView: View {
                 }
             }
         }
-        .sheet(isPresented: $viewModel.showModal) {
+        .sheet(isPresented: $viewModel.showPointView) {
+            // 地点詳細
             NavigationView {
                 PointView(selectedElement: viewModel.displayElement)
                     .navigationTitle(viewModel.selectedPointName)
                     .navigationBarTitleDisplayMode(.inline)
-                    .navigationBarItems(trailing: Button(action: { viewModel.showModal = false },
-                                                         label: { Image(systemName: "xmark") }))
+                    .navigationBarItems(trailing: Button(action: { viewModel.showPointView = false }) {
+                        Image(systemName: "xmark")
+                    })
             }
+        }
+        .sheet(isPresented: $viewModel.showSearchView) {
+            // 地点検索
+            SearchView()
+                .presentationDetents([ .medium ])
         }
         .alert(isPresented: $viewModel.hasError) {
             // エラー時にはAlertを表示する
