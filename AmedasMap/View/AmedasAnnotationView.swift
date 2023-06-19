@@ -61,13 +61,13 @@ extension AmedasData {
         return list
     }
     
-    func reuseIdentifier(for element: AmedasElement) -> String? {
+    // アイコンの描画色を決定
+    private func iconColor(for element: AmedasElement) -> ColorString? {
         guard let colors = Self.elementColors[element] else {
             fatalError("colors not defined for \(element)")
         }
 
         let colorIndex: Int
-        let ary: [String]
         
         switch element {
         case .temperature:
@@ -85,7 +85,7 @@ extension AmedasData {
             case -99 ..< -10:  colorIndex = 0
             default:  return nil
             }
-            ary = [ element.iconShape.rawValue, colors[colorIndex] ]
+            return colors[colorIndex]
 
         case .precipitation:
             guard let precipitation1h else { return nil }
@@ -101,10 +101,10 @@ extension AmedasData {
             case  0 ..<   1:  colorIndex = 0
             default:  return nil
             }
-            ary = [ element.iconShape.rawValue, colors[colorIndex] ]
+            return colors[colorIndex]
 
         case .wind:
-            guard let windDirection, let windSpeed else { return nil }
+            guard let windSpeed else { return nil }
             switch windSpeed {
             case 25 ... 99:  colorIndex = 5
             case 20 ..< 25:  colorIndex = 4
@@ -114,7 +114,7 @@ extension AmedasData {
             case  0 ..<  5:  colorIndex = 0
             default:  return nil
             }
-            ary = [ element.iconShape.rawValue, String(windDirection), colors[colorIndex] ]
+            return colors[colorIndex]
             
         case .sun:
             guard let sun1h else { return nil }
@@ -124,7 +124,7 @@ extension AmedasData {
             case  0 ..< 20:  colorIndex = 0
             default: return nil
             }
-            ary = [ element.iconShape.rawValue, colors[colorIndex] ]
+            return colors[colorIndex]
             
         case .humidity:
             guard let humidity else { return nil }
@@ -134,11 +134,11 @@ extension AmedasData {
             case  0 ..<  50:  colorIndex = 0
             default:  return nil
             }
-            ary = [ element.iconShape.rawValue, colors[colorIndex] ]
+            return colors[colorIndex]
             
         case .pressure:
             guard pressure != nil else { return nil }
-            ary = [ element.iconShape.rawValue, colors[0] ]
+            return colors[0]
             
         case .snow:
             guard let snow else { return nil }
@@ -153,10 +153,37 @@ extension AmedasData {
             case   0 ..<    5:  colorIndex = 0
             default:  return nil
             }
-            ary = [ element.iconShape.rawValue, colors[colorIndex] ]
+            return colors[colorIndex]
         }
+    }
+
+    // AmedasAnnotationView で使用
+    func reuseIdentifier(for element: AmedasElement) -> String? {
+        guard let colorString = iconColor(for: element) else { return nil }
         
-        return ary.joined(separator: ",")
+        switch element {
+        case .temperature, .precipitation, .sun, .humidity, .pressure, .snow:
+            return [ element.iconShape.rawValue, colorString ]
+                .joined(separator: ",")
+        case .wind:
+            guard let windDirection else { return nil }
+            return [ element.iconShape.rawValue, String(windDirection), colorString ]
+                .joined(separator: ",")
+        }
+    }
+    
+    // MapView2 で使用
+    func makeIcon(for element: AmedasElement) -> UIImage? {
+        guard let colorString = iconColor(for: element),
+              let color = UIColor(hex: colorString) else { return nil }
+        
+        switch element.iconShape {
+        case .circle:
+            return IconHelper.drawCircle(color: color)
+        case .arrow:
+            guard let windDirection else { return nil }
+            return IconHelper.drawArrow(direction: windDirection, color: color)
+        }
     }
 }
 
