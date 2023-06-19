@@ -179,8 +179,6 @@ final class AmedasAnnotation: MKPointAnnotation {
 
 // MARK: - AmedasAnnotationView
 final class AmedasAnnotationView: MKAnnotationView {
-    private let size = CGSize(width: 15, height: 15)
-    private let borderColor = UIColor.white
     override var alignmentRectInsets: UIEdgeInsets { .zero }
     
     var point: AmedasPoint?
@@ -195,75 +193,14 @@ final class AmedasAnnotationView: MKAnnotationView {
         guard let reuseIdentifier else { return }
         let ary = reuseIdentifier.components(separatedBy: ",")
         if ary.count == 2, ary[0] == AmedasElement.Shape.circle.rawValue, let color = UIColor(hex: ary[1]) {
-            drawCircle(color: color)
+            image = IconHelper.drawCircle(color: color)
         } else if ary.count == 3, ary[0] == AmedasElement.Shape.arrow.rawValue,
                   let direction = Int(ary[1]), let color = UIColor(hex: ary[2]) {
-            drawArrow(direction: direction, color: color)
-        }        
+            image = IconHelper.drawArrow(direction: direction, color: color)
+        }
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    // 円をを表示に設定
-    private func drawCircle(color: UIColor) {
-        //LOG(#function + ", color:\(color)")
-        UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
-        guard let context = UIGraphicsGetCurrentContext() else { return }
-        let rect = CGRect(origin: .zero, size: size)
-        let radius = min(size.width, size.height) / 2 - 3
-
-        // 色を指定
-        context.setFillColor(color.cgColor)
-        context.setStrokeColor(borderColor.cgColor)
-
-        // 円を描画
-        let path = UIBezierPath()
-        path.addArc(withCenter: CGPoint(x: rect.midX, y: rect.midY), radius: radius, startAngle: 0, endAngle: 2 * .pi, clockwise: true)
-        path.stroke()
-        path.fill()
-
-        // 画像を出力
-        self.image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-    }
-    
-    // 矢羽を表示に設定
-    private func drawArrow(direction: Int, color: UIColor) {
-        if direction == 0 {
-            drawCircle(color: color)
-            return
-        }
-        guard direction > 0, direction <= 16 else { return }
-        
-        //LOG(#function + ", direction:\(direction), color:\(color)")
-        UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
-        guard let context = UIGraphicsGetCurrentContext() else { return }
-        let rect = CGRect(origin: .zero, size: size)
-
-        // 色を指定
-        context.setFillColor(color.cgColor)
-        context.setStrokeColor(borderColor.cgColor)
-        
-        // 矢羽を描画
-        let path = UIBezierPath()
-        path.move(to: CGPoint(x: 0, y: -1.0))
-        path.addLine(to: CGPoint(x: 5.0, y: -5.0))
-        path.addLine(to: CGPoint(x: 0, y: 7.0))
-        path.addLine(to: CGPoint(x: -5.0, y: -5.0))
-        path.close()
-        
-        // 方角にあわせて回転
-        let rotation: CGFloat = 2 * .pi * CGFloat(direction) / 16
-        path.apply(CGAffineTransform(rotationAngle: rotation))
-        path.apply(CGAffineTransform(translationX: rect.midX, y: rect.midY))
-        
-        path.stroke()
-        path.fill()
-
-        // 画像を出力
-        self.image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
     }
 }
