@@ -161,11 +161,11 @@ extension AmedasData {
     func reuseIdentifier(for element: AmedasElement) -> String? {
         guard let colorString = iconColor(for: element) else { return nil }
         
-        switch element {
-        case .temperature, .precipitation, .sun, .humidity, .pressure, .snow:
+        switch element.iconShape {
+        case .circle:
             return [ element.iconShape.rawValue, colorString ]
                 .joined(separator: ",")
-        case .wind:
+        case .arrow:
             guard let windDirection else { return nil }
             return [ element.iconShape.rawValue, String(windDirection), colorString ]
                 .joined(separator: ",")
