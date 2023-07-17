@@ -66,6 +66,17 @@ private struct TimestampView: View {
                     .cornerRadius(4)
                     //.accessibilityLabel("検索")
             }
+            
+            // ランキング
+            Button(action: { viewModel.showRankingView = true }) {
+                Image(systemName: "trophy")
+                    .resizable()
+                    .padding(8)
+                    .frame(width: 30, height: 30)
+                    .background(Color.white)
+                    .cornerRadius(4)
+                    //.accessibilityLabel("検索")
+            }
         }
     }
 }
@@ -119,6 +130,17 @@ struct ContentView: View {
             // 地点検索
             SearchView()
                 .presentationDetents([ .medium ])
+        }
+        .sheet(isPresented: $viewModel.showRankingView) {
+            // 地点検索
+            NavigationView {
+                RankingView()
+                    .navigationTitle(viewModel.displayElement.title + "ランキング (" + viewModel.dateText + ")")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .navigationBarItems(trailing: Button(action: { viewModel.showRankingView = false }) {
+                        Image(systemName: "xmark")
+                    })
+            }
         }
         .alert(isPresented: $viewModel.hasError) {
             // エラー時にはAlertを表示する
