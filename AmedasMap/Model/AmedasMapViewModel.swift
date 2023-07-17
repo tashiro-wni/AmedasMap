@@ -140,14 +140,21 @@ final class AmedasMapViewModel: ObservableObject {
     func makeRanking(element: AmedasElement) -> [AmedasData] {
         switch element {
         case .temperature:
-            return amedasData.filter({ $0.hasValidData(for: element) })
+            return amedasData
+                .filter({ $0.hasValidData(for: element) })
                 .sorted(by: { $0.temperature! > $1.temperature! })
         case .precipitation:
-            return amedasData.filter({ $0.hasValidData(for: element) })
+            return amedasData
+                .filter({ $0.hasValidData(for: element) })
                 .sorted(by: { $0.precipitation1h! > $1.precipitation1h! })
         case .wind:
-            return amedasData.filter({ $0.hasValidData(for: element) })
+            return amedasData
+                .filter({ $0.hasValidData(for: element) })
                 .sorted(by: { $0.windSpeed! > $1.windSpeed! })
+        case .snow:
+            return amedasData
+                .filter({ $0.hasValidData(for: element) })
+                .sorted(by: { $0.snow! > $1.snow! })
         default:
             return []
         }

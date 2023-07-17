@@ -19,6 +19,15 @@ extension AmedasElement {
         case .snow:           return Image(systemName: "snowflake")
         }
     }
+    
+    var rankingAvailable: Bool {
+        switch self {
+        case .temperature, .precipitation, .wind, .snow:
+            return true
+        default:
+            return false
+        }
+    }
 }
 
 // MARK: - ElementPicker 表示要素を選択
@@ -75,8 +84,8 @@ private struct TimestampView: View {
                     .frame(width: 30, height: 30)
                     .background(Color.white)
                     .cornerRadius(4)
-                    //.accessibilityLabel("検索")
-            }
+                    //.accessibilityLabel("ランキング")
+            }.disabled(!viewModel.displayElement.rankingAvailable)
         }
     }
 }
