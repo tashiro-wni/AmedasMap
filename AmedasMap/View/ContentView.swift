@@ -19,6 +19,15 @@ extension AmedasElement {
         case .snow:           return Image(systemName: "snowflake")
         }
     }
+    
+    var rankingAvailable: Bool {
+        switch self {
+        case .temperature, .precipitation, .wind, .snow:
+            return true
+        default:
+            return false
+        }
+    }
 }
 
 // MARK: - ElementPicker 表示要素を選択
@@ -66,6 +75,17 @@ private struct TimestampView: View {
                     .cornerRadius(4)
                     //.accessibilityLabel("検索")
             }
+            
+            // ランキング
+            Button(action: { viewModel.showRankingView = true }) {
+                Image(systemName: "trophy")
+                    .resizable()
+                    .padding(8)
+                    .frame(width: 30, height: 30)
+                    .background(Color.white)
+                    .cornerRadius(4)
+                    //.accessibilityLabel("ランキング")
+            }.disabled(!viewModel.displayElement.rankingAvailable)
         }
     }
 }
@@ -123,6 +143,17 @@ struct ContentView: View {
             // 地点検索
             SearchView()
                 .presentationDetents([ .medium ])
+        }
+        .sheet(isPresented: $viewModel.showRankingView) {
+            // 地点検索
+            NavigationView {
+                RankingView()
+                    .navigationTitle(viewModel.displayElement.title + "ランキング (" + viewModel.dateText + ")")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .navigationBarItems(trailing: Button(action: { viewModel.showRankingView = false }) {
+                        Image(systemName: "xmark")
+                    })
+            }
         }
         .alert(isPresented: $viewModel.hasError) {
             // エラー時にはAlertを表示する
