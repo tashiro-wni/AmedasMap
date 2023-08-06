@@ -7,12 +7,23 @@
 
 import Foundation
 import UIKit
+import OSLog
 
-public func LOG(_ body: String, filename: String = #file, line: Int = #line) {
+private var loggerDic: [String: Logger] = [:]
+
+func LOG(_ body: String, filename: String = #file, line: Int = #line) {
     #if DEBUG
-        var file = filename.components(separatedBy: "/").last ?? filename
-        file = file.replacingOccurrences(of: ".swift", with: "")
-        NSLog("[%@:%d] %@", file, line, body)
+    var file = filename.components(separatedBy: "/").last ?? filename
+    file = file.replacingOccurrences(of: ".swift", with: "")
+
+    var logger: Logger? = loggerDic[file]
+    if logger == nil {
+        logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "", category: file)
+        loggerDic[file] = logger
+    }
+    
+    //NSLog("[%@:%d] %@", file, line, body)
+    logger?.info("L\(line) \(body)")
     #endif
 }
 
