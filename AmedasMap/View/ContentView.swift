@@ -97,9 +97,13 @@ struct ContentView: View {
 
     var body: some View {
         ZStack {
-            MapView()
-                .edgesIgnoringSafeArea(.all)
-                  
+            if #available(iOS 17.0, *) {
+                MapView2()
+            } else {
+                MapView()
+                    .edgesIgnoringSafeArea(.all)
+            }
+
             GeometryReader { geometry in
                 if geometry.size.width < 500 {
                     VStack {
