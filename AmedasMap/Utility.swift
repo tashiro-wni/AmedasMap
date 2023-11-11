@@ -23,7 +23,7 @@ func LOG(_ body: String, filename: String = #file, line: Int = #line) {
     }
     
     //NSLog("[%@:%d] %@", file, line, body)
-    logger?.info("L\(line) \(body)")
+    logger?.info("[\(file):\(line)] \(body)")
     #endif
 }
 
