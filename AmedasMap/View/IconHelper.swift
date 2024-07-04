@@ -15,7 +15,7 @@ enum IconHelper {
                            borderColor: UIColor = .white,
                            size: CGSize = defaultSize) -> UIImage? {
         //LOG(#function + ", color:\(color)")
-        return UIGraphicsImageRenderer(size: size).image { context in
+        UIGraphicsImageRenderer(size: size).image { context in
             let rect = CGRect(origin: .zero, size: size)
             let radius = min(size.width, size.height) / 2 - 3
 

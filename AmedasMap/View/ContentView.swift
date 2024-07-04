@@ -10,22 +10,22 @@ import SwiftUI
 extension AmedasElement {
     var image: Image {
         switch self {
-        case .temperature:    return Image(systemName: "thermometer")
-        case .precipitation:  return Image(systemName: "cloud.rain")
-        case .wind:           return Image(systemName: "wind")
-        case .sun:            return Image(systemName: "sun.max")
-        case .humidity:       return Image(systemName: "humidity")
-        case .pressure:       return Image(systemName: "rectangle.compress.vertical")
-        case .snow:           return Image(systemName: "snowflake")
+        case .temperature:    Image(systemName: "thermometer")
+        case .precipitation:  Image(systemName: "cloud.rain")
+        case .wind:           Image(systemName: "wind")
+        case .sun:            Image(systemName: "sun.max")
+        case .humidity:       Image(systemName: "humidity")
+        case .pressure:       Image(systemName: "rectangle.compress.vertical")
+        case .snow:           Image(systemName: "snowflake")
         }
     }
     
     var rankingAvailable: Bool {
         switch self {
         case .temperature, .precipitation, .wind, .snow:
-            return true
+            true
         default:
-            return false
+            false
         }
     }
 }
