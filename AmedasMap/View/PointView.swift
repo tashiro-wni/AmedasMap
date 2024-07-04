@@ -36,7 +36,9 @@ struct PointView: View {
                     }
                     .pickerStyle(SegmentedPickerStyle())
                     .frame(width: 250)
-                    .onChange(of: selectedElement, perform: { _ in selectedItem = nil })
+                    .onChange(of: selectedElement) {
+                        selectedItem = nil
+                    }
                 }
                 Divider()
                 
