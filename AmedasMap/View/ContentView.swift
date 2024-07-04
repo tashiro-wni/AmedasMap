@@ -122,6 +122,10 @@ struct ContentView: View {
                     .padding(8)
                 }
             }
+            
+            if viewModel.isLoading {
+                LoadingIndicator()
+            }
         }
         .sheet(isPresented: $viewModel.showPointView) {
             // 地点詳細
