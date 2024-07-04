@@ -55,6 +55,12 @@ final class AmedasMapViewModel: ObservableObject {
     // ランキング
     @Published var showRankingView = false
 
+    // Data Loading
+    var isLoading: Bool { isPointTableLoading || isMapDataLoading || isPointDataLoading }
+    private var isPointTableLoading = false
+    private var isMapDataLoading = false
+    @Published private(set) var isPointDataLoading = false
+
     private let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy/M/d H:mm"
@@ -82,11 +88,14 @@ final class AmedasMapViewModel: ObservableObject {
     private func loadPoints() async {
         LOG(#function)
         do {
+            isPointTableLoading = true
             let points = try await AmedasTableLoader.load()
+            isPointTableLoading = false
             hasError = false
             amedasPoints = points
             LOG("update amedasPoints \(points.count) points.")
         } catch {
+            isPointTableLoading = false
             hasError = true
         }
     }
@@ -96,12 +105,16 @@ final class AmedasMapViewModel: ObservableObject {
     private func loadMapData() async {
         LOG(#function)
         do {
+            isMapDataLoading = true
             let result = try await AmedasDataLoader.load()
+            isMapDataLoading = false
+
             hasError = false
             amedasData = result.data
             date = result.date
             LOG("update amedasData \(dateText), \(result.data.count) points.")
         } catch {
+            isMapDataLoading = false
             hasError = true
         }
     }
@@ -115,10 +128,13 @@ final class AmedasMapViewModel: ObservableObject {
 
         Task {
             do {
+                isPointDataLoading = true
                 selectedPointData = try await AmedasDataLoader.load(point: point, date: date)
                 updateSelectedPointElements()
+                isPointDataLoading = false
                 hasError = false
             } catch {
+                isPointDataLoading = false
                 hasError = true
             }
         }
