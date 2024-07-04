@@ -12,13 +12,13 @@ enum AmedasElement: CaseIterable {
 
     var title: String {
         switch self {
-        case .temperature:    return "気温"
-        case .precipitation:  return "降水量"
-        case .wind:           return "風速"
-        case .sun:            return "日照"
-        case .humidity:       return "湿度"
-        case .pressure:       return "気圧"
-        case .snow:           return "積雪深"
+        case .temperature:    "気温"
+        case .precipitation:  "降水量"
+        case .wind:           "風速"
+        case .sun:            "日照"
+        case .humidity:       "湿度"
+        case .pressure:       "気圧"
+        case .snow:           "積雪深"
         }
     }
 }
@@ -72,38 +72,38 @@ struct AmedasData: Hashable, Identifiable, CustomStringConvertible {
     func value(for element: AmedasElement) -> Double? {
         switch element {
         case .temperature:
-            return temperature
+            temperature
         case .precipitation:
-            return precipitation1h
+            precipitation1h
         case .wind:
-            return windSpeed
+            windSpeed
         case .sun:
-            return sun1h
+            sun1h
         case .humidity:
-            return humidity
+            humidity
         case .pressure:
-            return pressure
+            pressure
         case .snow:
-            return snow
+            snow
         }
     }
 
     func text(for element: AmedasElement) -> String {
         switch element {
         case .temperature:
-            return temperatureText
+            temperatureText
         case .precipitation:
-            return precipitationText
+            precipitationText
         case .wind:
-            return windText
+            windText
         case .sun:
-            return sunText
+            sunText
         case .humidity:
-            return humidityText
+            humidityText
         case .pressure:
-            return pressureText
+            pressureText
         case .snow:
-            return snowText
+            snowText
         }
     }
     

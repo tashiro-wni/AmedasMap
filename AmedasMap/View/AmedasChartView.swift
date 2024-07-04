@@ -15,37 +15,37 @@ private extension AmedasElement {
     
     var chartType: ChartType {
         switch self {
-        case .temperature:    return .line
-        case .precipitation:  return .bar
-        case .wind:           return .line
-        case .sun:            return .bar
-        case .humidity:       return .line
-        case .pressure:       return .line
-        case .snow:           return .area
+        case .temperature:    .line
+        case .precipitation:  .bar
+        case .wind:           .line
+        case .sun:            .bar
+        case .humidity:       .line
+        case .pressure:       .line
+        case .snow:           .area
         }
     }
     
     var chartColor: Color {
         switch self {
-        case .temperature:    return .red
-        case .precipitation:  return .blue
-        case .wind:           return .green
-        case .sun:            return .orange
-        case .humidity:       return .cyan
-        case .pressure:       return .green
-        case .snow:           return .cyan
+        case .temperature:    .red
+        case .precipitation:  .blue
+        case .wind:           .green
+        case .sun:            .orange
+        case .humidity:       .cyan
+        case .pressure:       .green
+        case .snow:           .cyan
         }
     }
 
     var chartRange: (min: Double?, max: Double?) {
         switch self {
-        case .temperature:    return (min: nil, max: nil)
-        case .precipitation:  return (min: 0.0, max: 4.0)
-        case .wind:           return (min: 0.0, max: nil)
-        case .sun:            return (min: 0.0, max: 1.0)
-        case .humidity:       return (min: 0.0, max: 100.0)
-        case .pressure:       return (min: nil, max: nil)
-        case .snow:           return (min: 0.0, max: 4.0)
+        case .temperature:    (min: nil, max: nil)
+        case .precipitation:  (min: 0.0, max: 4.0)
+        case .wind:           (min: 0.0, max: nil)
+        case .sun:            (min: 0.0, max: 1.0)
+        case .humidity:       (min: 0.0, max: 100.0)
+        case .pressure:       (min: nil, max: nil)
+        case .snow:           (min: 0.0, max: 4.0)
         }
     }
 }

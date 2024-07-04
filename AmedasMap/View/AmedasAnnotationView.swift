@@ -16,9 +16,9 @@ private extension AmedasElement {
     var iconShape: Shape {
         switch self {
         case .temperature, .precipitation, .sun, .humidity, .pressure, .snow:
-            return .circle
+            .circle
         case .wind:
-            return .arrow
+            .arrow
         }
     }
 }
