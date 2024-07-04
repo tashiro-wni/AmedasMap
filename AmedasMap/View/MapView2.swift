@@ -14,7 +14,6 @@ extension AmedasPoint {
     }
 }
 
-@available(iOS 17.0, *)
 struct MapView2: View {
     @EnvironmentObject private var viewModel: AmedasMapViewModel
     @State private var position: MapCameraPosition = .automatic

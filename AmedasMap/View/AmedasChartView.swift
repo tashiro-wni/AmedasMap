@@ -70,14 +70,14 @@ struct AmedasChartView: View {
         .chartBackground { proxy in
             ZStack(alignment: .topTrailing) {
                 GeometryReader { nthGeoItem in
-                    if let selectedItem {
+                    if let selectedItem, let plotFrame = proxy.plotFrame {
                         let dateInterval = Calendar.current.dateInterval(of: .minute, for: selectedItem.date)!
                         let startPositionX1 = proxy.position(forX: dateInterval.start) ?? 0
                         let startPositionX2 = proxy.position(forX: dateInterval.end) ?? 0
-                        let midStartPositionX = (startPositionX1 + startPositionX2) / 2 + nthGeoItem[proxy.plotAreaFrame].origin.x
+                        let midStartPositionX = (startPositionX1 + startPositionX2) / 2 + nthGeoItem[plotFrame].origin.x
 
                         let lineX = layoutDirection == .rightToLeft ? nthGeoItem.size.width - midStartPositionX : midStartPositionX
-                        let lineHeight = nthGeoItem[proxy.plotAreaFrame].maxY
+                        let lineHeight = nthGeoItem[plotFrame].maxY
                         let boxWidth: CGFloat = 110
                         let boxOffset = max(0, min(nthGeoItem.size.width - boxWidth, lineX - boxWidth / 2))
 
@@ -134,7 +134,8 @@ struct InteractiveAmedasChart: View {
 
     // 触れている箇所の座標から値を取得
     private func findItem(location: CGPoint, proxy: ChartProxy, geometry: GeometryProxy) -> (date: Date, text: String)? {
-        let relativeXPosition = location.x - geometry[proxy.plotAreaFrame].origin.x
+        guard let plotFrame = proxy.plotFrame else { return nil }
+        let relativeXPosition = location.x - geometry[plotFrame].origin.x
         guard let date = proxy.value(atX: relativeXPosition) as Date? else { return nil }
 
         // Find the closest date element.

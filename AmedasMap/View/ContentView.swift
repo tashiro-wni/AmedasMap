@@ -97,12 +97,7 @@ struct ContentView: View {
 
     var body: some View {
         ZStack {
-            if #available(iOS 17.0, *) {
-                MapView2()
-            } else {
-                MapView()
-                    .edgesIgnoringSafeArea(.all)
-            }
+            MapView2()
 
             GeometryReader { geometry in
                 if geometry.size.width < 500 {
@@ -159,8 +154,8 @@ struct ContentView: View {
             // エラー時にはAlertを表示する
             Alert(title: Text(viewModel.errorMessage))
         }
-        .onChange(of: phase) { newPhase in
-            if newPhase == .active {
+        .onChange(of: phase) {
+            if phase == .active {
                 LOG("scenePhase changed ACTIVE!!")
                 viewModel.reload()
             }
