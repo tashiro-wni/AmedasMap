@@ -9,21 +9,23 @@ import Foundation
 import UIKit
 import OSLog
 
-private var loggerDic: [String: Logger] = [:]
+@MainActor private var loggerDic: [String: Logger] = [:]
 
 func LOG(_ body: String, filename: String = #file, line: Int = #line) {
     #if DEBUG
     var file = filename.components(separatedBy: "/").last ?? filename
     file = file.replacingOccurrences(of: ".swift", with: "")
 
-    var logger: Logger? = loggerDic[file]
-    if logger == nil {
-        logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "", category: file)
-        loggerDic[file] = logger
+    Task { @MainActor in
+        var logger: Logger? = loggerDic[file]
+        if logger == nil {
+            logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "", category: file)
+            loggerDic[file] = logger
+        }
+        
+        //NSLog("[%@:%d] %@", file, line, body)
+        logger?.info("L\(line) \(body)")
     }
-    
-    //NSLog("[%@:%d] %@", file, line, body)
-    logger?.info("L\(line) \(body)")
     #endif
 }
 

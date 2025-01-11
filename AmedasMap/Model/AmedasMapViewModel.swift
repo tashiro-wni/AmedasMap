@@ -8,6 +8,7 @@
 import Foundation
 
 // MARK: - AmedasMapViewModel
+@MainActor
 final class AmedasMapViewModel: ObservableObject {
     @Published private(set) var amedasPoints: [String: AmedasPoint] = [:]
     @Published private(set) var amedasData: [AmedasData] = []
@@ -84,7 +85,6 @@ final class AmedasMapViewModel: ObservableObject {
     }
     
     // 地点リストを読み込み
-    @MainActor
     private func loadPoints() async {
         LOG(#function)
         do {
@@ -101,7 +101,6 @@ final class AmedasMapViewModel: ObservableObject {
     }
 
     // 最新の観測データを読み込み
-    @MainActor
     private func loadMapData() async {
         LOG(#function)
         do {
@@ -120,7 +119,6 @@ final class AmedasMapViewModel: ObservableObject {
     }
 
     // 指定地点の時系列データを読み込み
-    @MainActor
     func loadPointData(_ point: String) {
         LOG(#function + ", point:\(point)")
         guard let date else { return }
