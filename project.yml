@@ -7,6 +7,7 @@ options:
 settings:
   base:
     DEVELOPMENT_TEAM: 97JN7SJ3KH
+    SWIFT_VERSION: 6.0
 
 targets:
   AmedasMap:
