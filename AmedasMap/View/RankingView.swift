@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct RankingView: View {
-    @EnvironmentObject private var viewModel: AmedasMapViewModel
+    @Environment(AmedasMapViewModel.self) private var viewModel
     
     var body: some View {
         ScrollView(.vertical) {

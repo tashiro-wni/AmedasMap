@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PointView: View {
-    @EnvironmentObject private var viewModel: AmedasMapViewModel
+    @Environment(AmedasMapViewModel.self) private var viewModel
     @State var selectedElement: AmedasElement
     @State var selectedItem: (date: Date, text: String)? = nil
 

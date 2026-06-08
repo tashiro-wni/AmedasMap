@@ -8,9 +8,10 @@
 import SwiftUI
 
 struct SearchView: View {
-    @EnvironmentObject private var viewModel: AmedasMapViewModel
-    
+    @Environment(AmedasMapViewModel.self) private var viewModel
+
     var body: some View {
+        @Bindable var viewModel = viewModel
         VStack {
             TextField("地点を検索", text: $viewModel.searchText)
                 .padding(20)

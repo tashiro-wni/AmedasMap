@@ -15,7 +15,7 @@ extension AmedasPoint {
 }
 
 struct MapView2: View {
-    @EnvironmentObject private var viewModel: AmedasMapViewModel
+    @Environment(AmedasMapViewModel.self) private var viewModel
     @State private var position: MapCameraPosition = .automatic
     
     var body: some View {

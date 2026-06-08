@@ -32,9 +32,10 @@ extension AmedasElement {
 
 // MARK: - ElementPicker 表示要素を選択
 private struct ElementPicker: View {
-    @EnvironmentObject private var viewModel: AmedasMapViewModel
+    @Environment(AmedasMapViewModel.self) private var viewModel
 
     var body: some View {
+        @Bindable var viewModel = viewModel
         Picker(selection: $viewModel.displayElement, label: EmptyView()) {
             ForEach(AmedasElement.allCases, id: \.self) { element in
                 element.image.accessibilityLabel(element.title)
@@ -47,7 +48,7 @@ private struct ElementPicker: View {
 
 // MARK: - TimestampView データの時刻, 再読み込みボタン
 private struct TimestampView: View {
-    @EnvironmentObject private var viewModel: AmedasMapViewModel
+    @Environment(AmedasMapViewModel.self) private var viewModel
 
     var body: some View {
         HStack(spacing: 10) {
@@ -93,9 +94,10 @@ private struct TimestampView: View {
 // MARK: - ContentView
 struct ContentView: View {
     @Environment(\.scenePhase) private var phase
-    @EnvironmentObject private var viewModel: AmedasMapViewModel
+    @Environment(AmedasMapViewModel.self) private var viewModel
 
     var body: some View {
+        @Bindable var viewModel = viewModel
         ZStack {
             MapView2()
 

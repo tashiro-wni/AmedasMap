@@ -6,13 +6,15 @@
 //
 
 import Foundation
+import Observation
 
 // MARK: - AmedasMapViewModel
 @MainActor
-final class AmedasMapViewModel: ObservableObject {
-    @Published private(set) var amedasPoints: [String: AmedasPoint] = [:]
-    @Published private(set) var amedasData: [AmedasData] = []
-    @Published private(set) var date: Date?
+@Observable
+final class AmedasMapViewModel {
+    private(set) var amedasPoints: [String: AmedasPoint] = [:]
+    private(set) var amedasData: [AmedasData] = []
+    private(set) var date: Date?
     var dateText: String {
         if let date {
             return dateFormatter.string(from: date)
@@ -21,14 +23,14 @@ final class AmedasMapViewModel: ObservableObject {
             return "Loading..."
         }
     }
-    @Published var hasError = false
+    var hasError = false
     var errorMessage: String {
         hasError ? "データが読み込めませんでした。" : ""
     }
-    @Published var displayElement: AmedasElement = .temperature
-    
+    var displayElement: AmedasElement = .temperature
+
     // 地点詳細画面
-    @Published var showPointView: Bool = false
+    var showPointView: Bool = false
     private(set) var selectedPoint: String = "" {
         didSet {
             selectedPointName = String(format: "%@(%@)",
@@ -45,8 +47,8 @@ final class AmedasMapViewModel: ObservableObject {
     private(set) var selectedPointElements: [AmedasElement] = []
     
     // 地点検索
-    @Published var showSearchView = false
-    @Published var searchText = ""
+    var showSearchView = false
+    var searchText = ""
     var filterdPoints: [AmedasPoint] {
         amedasPoints.values
             .filter { $0.pointNameJa.contains(searchText) }
@@ -54,14 +56,15 @@ final class AmedasMapViewModel: ObservableObject {
     }
     
     // ランキング
-    @Published var showRankingView = false
+    var showRankingView = false
 
     // Data Loading
     var isLoading: Bool { isPointTableLoading || isMapDataLoading || isPointDataLoading }
     private var isPointTableLoading = false
     private var isMapDataLoading = false
-    @Published private(set) var isPointDataLoading = false
+    private(set) var isPointDataLoading = false
 
+    @ObservationIgnored
     private let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy/M/d H:mm"

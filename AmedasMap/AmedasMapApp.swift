@@ -9,10 +9,12 @@ import SwiftUI
 
 @main
 struct AmedasMapApp: App {
+    @State private var viewModel = AmedasMapViewModel()
+
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(AmedasMapViewModel())
+                .environment(viewModel)
         }
     }
 }
