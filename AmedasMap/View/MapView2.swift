@@ -19,14 +19,20 @@ struct MapView2: View {
     @State private var position: MapCameraPosition = .automatic
     
     var body: some View {
+        // Map の @MapContentBuilder 内のアクセスは @Observable の依存として
+        // 登録されないため、body スコープで読み出して依存を確定させる
+        let displayElement = viewModel.displayElement
+        let amedasData = viewModel.amedasData
+        let amedasPoints = viewModel.amedasPoints
+
         Map(position: $position,
             interactionModes: MapInteractionModes(arrayLiteral: [ .pan, .zoom ] )) {
 
             // アイコンプロット
-            ForEach(viewModel.amedasData) { data in
-                if let point = viewModel.amedasPoints[data.pointID],
-                   data.hasValidData(for: viewModel.displayElement),
-                   let icon = data.makeIcon(for: viewModel.displayElement) {
+            ForEach(amedasData) { data in
+                if let point = amedasPoints[data.pointID],
+                   data.hasValidData(for: displayElement),
+                   let icon = data.makeIcon(for: displayElement) {
                     Annotation("", coordinate: point.coordinate) {
                         Image(uiImage: icon)
                             .onTapGesture {
